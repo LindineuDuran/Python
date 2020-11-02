@@ -1,0 +1,115 @@
+nome;tag;tag_pai;municipio;cod_ibge
+ID_TIPO;;;;
+DescricaoTipo;;;;
+ID_TAG;;;;
+NuNFSe;Numero;;Ponta Grossa;4119905
+NuNFSePai;;;;
+SerieNFSe;;;;
+SerieNFSePai;;;;
+Tipo;;;;
+TipoPai;;;;
+DHEMI;DataEmissao;;Ponta Grossa;4119905
+DHEMIPai;;;;
+NatOp;;;;
+NatOpPai;;;;
+MunGer;CodigoMunicipio;OrgaoGerador;Ponta Grossa;4119905
+MunGerPai;;;;
+Discriminacao;Discriminacao;;Ponta Grossa;4119905
+DiscriminacaoPai;;;;
+TomadorRazao;;;;
+TomadorRazaoPai;;;;
+TomadorCNPJ;;;;
+TomadorCNPJPai;;;;
+PrestadorRazao;RazaoSocial;DadosPrestador;Ponta Grossa;4119905
+PrestadorRazaoPai;;;;
+PrestadorCNPJ;Cnpj;DadosPrestador;Ponta Grossa;4119905
+PrestadorCNPJPai;;;;
+PrestadorCPF;;;;
+PrestadorCPFPai;;;;
+OptanteSimples;;;;
+OptanteSimplesPai;;;;
+Inscricao;InscricaoMunicipal;DadosPrestador;Ponta Grossa;4119905
+InscricaoPai;;;;
+PrestadorUF;;;;
+PrestadorUFPai;;;;
+RegEspTrib;RegimeEspecialTributacao;;Ponta Grossa;4119905
+RegEspTribPai;;;;
+Competencia;Competencia;;Ponta Grossa;4119905
+CompetenciaPai;;;;
+CodVerificacaoNFSe;;;;
+CodVerificacaoNFSePai;;;;
+CodServNFSe;ItemListaServico;;Ponta Grossa;4119905
+CodServNFSePai;;;;
+CodServ_CodTrib_NFSe;;;;
+CodServ_CodTrib_NFSePai;;;;
+ValorTotal;ValorServicos;;Ponta Grossa;4119905
+ValorTotalPai;;;;
+ValorServico;;;;
+ValorServicoPai;;;;
+ValorDeducoes;ValorDeducoes;;Ponta Grossa;4119905
+ValorDeducoesPai;;;;
+ValorPIS;ValorPis;Valores;Ponta Grossa;4119905
+ValorPISPai;;;;
+ValorCOFINS;ValorCofins;Valores;Ponta Grossa;4119905
+ValorCOFINSPai;;;;
+ValorINSS;ValorInss;Valores;Ponta Grossa;4119905
+ValorINSSPai;;;;
+ValorIR;ValorIr;Valores;Ponta Grossa;4119905
+ValorIRPai;;;;
+ValorCsll;ValorCsll;Valores;Ponta Grossa;4119905
+ValorCsllPai;;;;
+ISSRetido;;;;
+ISSRetidoPai;;;;
+RetencaoISS;IssRetido;Servico;Ponta Grossa;4119905
+retencaoISSPai;;;;
+NomePrestador;;;;
+NomePrestadorPai;;;;
+ValorISS;ValorIss;ValoresNfse;Ponta Grossa;4119905
+ValorISSPai;;;;
+OutrasRetencoes;OutrasRetencoes;Valores;Ponta Grossa;4119905
+OutrasRetencoesPai;;;;
+BaseCalculo;BaseCalculo;ValoresNfse;Ponta Grossa;4119905
+BaseCalculoPai;;;;
+Aliquota;Aliquota;ValoresNfse;Ponta Grossa;4119905
+Aliquota;Valores;Valores;Ponta Grossa;4119905
+AliquotaPai;;;;
+ValorLiquido;ValorLiquidoNfse;ValoresNfse;Ponta Grossa;4119905
+ValorLiquidoPai;;;;
+XPEDCab;;;;
+XPEDCabPai;;;;
+NITEMPEDCab;;;;
+NITEMPEDCabPai;;;;
+VALOR_DESCONTO;;;;
+VALOR_DESCONTOPai;;;;
+MunicipioGerador;;;;
+MunicipioGeradorPai;;;;
+Atividade;CodigoCnae;Servico;Ponta Grossa;4119905
+AtividadePai;;;;
+OutrasInformacoes;;;;
+OutrasInformacoesPai;;;;
+DescricaoTipoServico;;;;
+DescricaoTipoServicoPai;;;;
+LocalPrestacao;;;;
+LocalPrestacaoPai;;;;
+UFPrestacao;;;;
+UFPrestacaoPai;;;;
+ItemCODIGO_SERVICO;;;;
+ItemCODIGO_SERVICOPai;;;;
+ItemsDESCRICAO_SERVICO;;;;
+ItemsDESCRICAO_SERVICOPai;;;;
+ItemsQTD_ITEM_SERVICO;;;;
+ItemsQTD_ITEM_SERVICOPai;;;;
+ItemsVALOR_UNITARIO;;;;
+ItemsVALOR_UNITARIOPai;;;;
+ItemsVALOR_TOTAL;;;;
+ItemsVALOR_TOTALPai;;;;
+ItemsTRIBUTADO;;;;
+ItemsTRIBUTADOPai;;;;
+ItemsNumeroPedidoCompra;;;;
+ItemsNumeroPedidoCompraPai;;;;
+ItemsLinhaPedidoCompra;;;;
+ItemsLinhaPedidoCompraPai;;;;
+ItemsVALOR_DESCONTO;;;;
+ItemsVALOR_DESCONTOPai;;;;
+CodigosMunicipios;;;;
+CODVERIFICACAO;CodigoVerificacao;;Ponta Grossa;4119905

@@ -1,0 +1,4 @@
+País;Capital;População
+Bélgica;Bruxelas;123465
+Índia;Nova Delhi;456789
+Brasil;Brasília;987654
