@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>830</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QScrollArea" name="saCheckBoxList">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>20</y>
+      <width>290</width>
+      <height>460</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>286</width>
+       <height>456</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="lblArquivosDisponiveis">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>0</y>
+      <width>320</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Arquivos Disponíveis</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTextoLido_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>110</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Resultado da Extração</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnProcessar">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>490</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Processar</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normalon>../Extrair Dados de XML/images/gear.png</normalon>
+     </iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnLimpar">
+    <property name="geometry">
+     <rect>
+      <x>95</x>
+      <y>490</y>
+      <width>60</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Limpar</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>images/eraser.png</normaloff>images/eraser.png</iconset>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tbvExtratacao">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>510</width>
+      <height>460</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chBoxNewOutputFile">
+    <property name="geometry">
+     <rect>
+      <x>165</x>
+      <y>493</y>
+      <width>170</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sobreescreve arquivo de saída</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>830</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAction">
+    <property name="title">
+     <string>Actions</string>
+    </property>
+   </widget>
+   <addaction name="menuAction"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSelect_Folder">
+   <property name="text">
+    <string>Select Folder</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

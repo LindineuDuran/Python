@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>830</width>
+    <height>540</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPlainTextEdit" name="pteTextoLido">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>20</y>
+      <width>340</width>
+      <height>320</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cboPrimeiroPadraoPesq">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>370</y>
+      <width>400</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblExtracao">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Resultado da Extração</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTextoLido">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>0</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Texto Lido</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblPrimeiroPadraoPesq">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>350</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Primeiro Padrão Pesquisado</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblPrimeiroPadraoDesejado">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>350</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Primeiro Padrão Desejado</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cboPrimeiroPadraoDesejado">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>370</y>
+      <width>400</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cboSegundoPadraoPesq">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>420</y>
+      <width>400</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cboSegundoPadraoDesejado">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>420</y>
+      <width>400</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblSegundoPadraoDesejado">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>400</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Segundo Padrão Desejado</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblSegundoPadraoPesq">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>400</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Segundo Padrão Pesquisado</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cboTerceiroPadraoPesq">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>470</y>
+      <width>400</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cboTerceiroPadraoDesejado">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>470</y>
+      <width>400</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTerceiroPadraoDesejado">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>450</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Terceiro Padrão Desejado</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTerceiroPadraoPesq">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>450</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Terceiro Padrão Pesquisado</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnProcessar">
+    <property name="geometry">
+     <rect>
+      <x>145</x>
+      <y>510</y>
+      <width>80</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Processar</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>images/gear.png</normaloff>images/gear.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnSair">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>510</y>
+      <width>60</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sair</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>images/door-open-out.png</normaloff>images/door-open-out.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnSelecionarArquivo">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>510</y>
+      <width>120</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Selecionar Arquivo</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>images/folder-open.png</normaloff>images/folder-open.png</iconset>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chBoxNewOutputFile">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>515</y>
+      <width>170</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sobreescreve arquivo de saída</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnLimpar">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>510</y>
+      <width>60</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Limpar</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>images/eraser.png</normaloff>images/eraser.png</iconset>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tbvExtratacao">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>460</width>
+      <height>320</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
