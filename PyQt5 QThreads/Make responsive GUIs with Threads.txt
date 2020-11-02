@@ -1,0 +1,4 @@
+Master PyQt5 part 10: Make responsive GUIs with Threads
+
+https://www.youtube.com/watch?v=Hwk242UMFR8&t=227s
+https://github.com/alandmoore/PyQt-Videos-Examples/blob/master/QtResponsiveGUIThreading/hasher_unthreaded.py
