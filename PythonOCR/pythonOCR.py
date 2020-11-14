@@ -68,44 +68,52 @@ class PythonOCR(wx.Frame):
 
     def makeMenuBar(self):
         """Obtêm o caminho das imagens"""
-        images_path = os.path.abspath(r'.\images')
+        images_path = os.path.abspath(r'.\icones')
 
         """Make a file menu with Open and Exit items"""
         fileMenu = wx.Menu()
 
-        openItem = fileMenu.Append(wx.ID_OPEN, '', 'Selecionar pasta de imagens')
-        openItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-open.png')))
+        openItem = fileMenu.Append(wx.ID_OPEN, 'Abrir\tCtrl+O', 'Selecionar pasta de imagens')
+        if os.path.exists(os.path.join(images_path, 'gtk-open.png')):
+            openItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-open.png')))
 
-        saveItem = fileMenu.Append(wx.ID_SAVE, '', 'Salvar o texto obtido')
-        saveItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-save.png')))
+        saveItem = fileMenu.Append(wx.ID_SAVE, 'Salvar\tCtrl+S', 'Salvar o texto obtido')
+        if os.path.exists(os.path.join(images_path, 'gtk-save.png')):
+            saveItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-save.png')))
 
         fileMenu.AppendSeparator()
 
         exitItem = fileMenu.Append(wx.ID_EXIT, 'Sair\tCtrl+Q', 'Encerrar o aplicativo')
-        exitItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-quit.png')))
+        if os.path.exists(os.path.join(images_path, 'gtk-quit.png')):
+            exitItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-quit.png')))
 
         # Make a edit menu with GetText and CleanText items
         editMenu = wx.Menu()
 
         getItem = editMenu.Append(wx.ID_EXECUTE, "Obtêm Texto\tCtrl+G", "Reconhece o texto da imagem")
-        getItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-bold.png')))
+        if os.path.exists(os.path.join(images_path, 'gtk-bold.png')):
+            getItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-bold.png')))
 
         cleanItem = editMenu.Append(wx.ID_CLEAR, "Limpa Texto\tCtrl+L", "Limpa o texto obtido")
-        cleanItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-clear.png')))
+        if os.path.exists(os.path.join(images_path, 'gtk-clear.png')):
+            cleanItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-clear.png')))
 
         # Make a view menu with ZoonIn, ZoonOut
         viewMenu = wx.Menu()
 
         zoomInItem = viewMenu.Append(wx.ID_ZOOM_IN, "Ampliar\tCtrl++", "Amplia a imagem")
-        zoomInItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-zoom-in.png')))
+        if os.path.exists(os.path.join(images_path, 'gtk-zoom-in.png')):
+            zoomInItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-zoom-in.png')))
 
         zoomOutItem = viewMenu.Append(wx.ID_ZOOM_OUT, "Reduzir\tCtrl+-", "Reduz a imagem")
-        zoomOutItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-zoom-out.png')))
+        if os.path.exists(os.path.join(images_path, 'gtk-zoom-out.png')):
+            zoomOutItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-zoom-out.png')))
 
         # Now a help menu for the about item
         helpMenu = wx.Menu()
         aboutItem = helpMenu.Append(wx.ID_ABOUT,'Sobre\tCtrl+A','Descreve as funcionalidades do aplicativo')
-        aboutItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-about.png')))
+        if os.path.exists(os.path.join(images_path, 'gtk-about.png')):
+            aboutItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-about.png')))
 
         # Make the menu bar and add the menus to it.
         menuBar = wx.MenuBar()
@@ -171,7 +179,8 @@ class PythonOCR(wx.Frame):
 
     def onAbout(self, event):
         """Display an About Dialog"""
-        wx.MessageBox(""" Objetivo: exibir imagens (*.jpg, *.jpeg, *.png, *.bmp),
+        wx.MessageBox(""" Desenvolvido por Lindineu Duran (lduran355@gmail.com)
+Objetivo: exibir imagens (*.jpg, *.jpeg, *.png, *.bmp),
 		                  manipulá-las (aplicar zoom, panorâmica e girar imagens) e
 		                  obter textos.
 
