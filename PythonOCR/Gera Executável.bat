@@ -1,0 +1,1 @@
+pyinstaller pythonOCR.py -y -w --onefile --exclude-module matplotlib --exclude-module pandas --exclude-module PyQt5 --exclude-module requests --exclude-module setuptools --exclude-module six

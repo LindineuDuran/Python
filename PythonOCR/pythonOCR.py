@@ -26,15 +26,15 @@ class PythonOCR(wx.Frame):
         # ensure the parent's __init__ is called
         super(PythonOCR, self).__init__(*args, **kw)
 
-        self.panel1 = wx.Panel(self, size=(785,300), pos=(0,0), style=wx.SIMPLE_BORDER)
+        self.panel1 = wx.Panel(self, size=(795,300), pos=(0,0), style=wx.SIMPLE_BORDER)
         self.panel1.SetBackgroundColour('#A0A0A0')
 
-        self.panel2 = wx.Panel(self,-1,size=(785,220), pos=(0,300), style=wx.SIMPLE_BORDER)
+        self.panel2 = wx.Panel(self,-1,size=(795,227), pos=(0,300), style=wx.SIMPLE_BORDER)
         self.panel2.SetBackgroundColour('#FDDF99')
 
         self.imgbox = wx.BoxSizer(wx.VERTICAL)
 
-        self.tc = wx.TextCtrl(self.panel2, -1, size=(785,220), style=wx.TE_MULTILINE)
+        self.tc = wx.TextCtrl(self.panel2, -1, size=(795,227), style=wx.TE_MULTILINE)
 
         self.textbox = wx.BoxSizer(wx.VERTICAL)
         self.textbox.Add(self.tc,proportion=1,flag = wx.EXPAND)
