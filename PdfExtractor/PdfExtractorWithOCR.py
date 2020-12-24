@@ -64,7 +64,6 @@ class DocPdf:
 
 docPdf = DocPdf()
 
-
 def extrai_texto(texto, padrao):
         textoNovoRegex = re.compile(padrao)
         textoNovo = textoNovoRegex.search(texto)
@@ -77,50 +76,38 @@ def limpa_texto(page_content):
 
     return parsed
 
-def extrai_img_de_pdf(fileName):
-    with open(fileName, "rb") as file:
-        pdf = file.read()
+def convert_pdf_to_img(fileName):
+    image = Image.new('RGBA', (20, 20))
+    try:
+        dpi = 300 # dots per inch
+        pages = convert_from_path(fileName ,dpi )
 
-    startmark = b"\xff\xd8"
-    startfix = 0
-    endmark = b"\xff\xd9"
-    endfix = 2
-    i = 0
+        if pages is not None:
+            # print('imagem convertida 300 dpi: ' , fileName)
+            image = pages[0]
+    except:
+        try:
+            dpi = 200 # dots per inch
+            pages = convert_from_path(fileName ,dpi )
 
-    njpg = 0
-    while True:
-        istream = pdf.find(b"stream", i)
-        if istream < 0:
-            break
-        istart = pdf.find(startmark, istream, istream + 20)
-        if istart < 0:
-            i = istream + 20
-            continue
-        iend = pdf.find(b"endstream", istart)
-        if iend < 0:
-            raise Exception("Didn't find end of stream!")
-        iend = pdf.find(endmark, iend - 20)
-        if iend < 0:
-            raise Exception("Didn't find end of JPG!")
+            if pages is not None:
+                # print('imagem convertida 200 dpi: ' , fileName)
+                image = pages[0]
+        except:
+            print('Error ao converter o PDF em imagem ', fileName)
 
-        istart += startfix
-        iend += endfix
-        jpg = pdf[istart:iend]
-        newfile = "{}jpg".format(fileName[:-3])
-        with open(newfile, "wb") as jpgfile:
-            jpgfile.write(jpg)
-
-        njpg += 1
-        i = iend
-
-        image = Image.open(newfile)
-        return image
+    return image
 
 def processa_imagem(fileName):
-    image = extrai_img_de_pdf(fileName)
-    texto = pytesseract.image_to_string(image)
+    image = Image.new('RGBA', (20, 20))
+    pdf = {"numNF": "ERRO", "cnpj": "cnpj", "chave": fileName, "parsed": "parsed"}
 
-    pdf = processa_dados(texto)
+    image = convert_pdf_to_img(fileName)
+    if image is not None:
+        # print('imagem convertida: ' , fileName)
+        texto = pytesseract.image_to_string(image)
+        # print('texto extraído: ' , texto)
+        pdf = processa_dados(texto)
 
     imgFileName = "{}jpg".format(fileName[:-3])
     if os.path.exists(imgFileName):
@@ -140,7 +127,10 @@ def processa_dados(parsed):
             numNF = extrai_texto(numNF.group(), "(\d{3}).(\d{3}).(\d{3})|(\d{1,10})")
 
             if numNF is not None:
-                numNF = int(numNF.group().replace('.', ''))
+                try:
+                    numNF = int(numNF.group().replace('.', '').replace(',', ''))
+                except:
+                    print('numNF: ', numNF)
             else:
                 numNF = ''
         else:
@@ -157,9 +147,12 @@ def processa_dados(parsed):
         else:
             cnpj = ''
 
-        chave = extrai_texto(parsed, "(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})|(\d{44})")
+        chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})|(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})|(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})|(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})|(\d{44})')
+
         if chave is not None:
-            chave = chave.group().replace(' ', '')
+            chave = chave.group().replace('.', '').replace(' ', '').replace('\n', '')
+        else:
+            chave = ''
 
         pdf_info = {"numNF": str(numNF), "cnpj": cnpj, "chave": chave, "parsed": parsed}
 
@@ -175,26 +168,41 @@ class Worker(qtc.QObject):
             fileName = os.path.join(data_path, item)
 
             pdf_file = open(fileName, 'rb')
-            pdfReader = PyPDF2.PdfFileReader(fileName)
-            number_of_pages = pdfReader.getNumPages()
 
-            page = pdfReader.getPage(0)
-            page_content = page.extractText()
+            try:
+                pdfReader = PyPDF2.PdfFileReader(fileName, strict=False)
+                number_of_pages = pdfReader.getNumPages()
 
-            if page_content != '':
-                for x in range(number_of_pages):
-                    page = pdfReader.getPage(x)
-                    pdf = processa_texto(page)
+                page = pdfReader.getPage(0)
+                page_content = page.extractText()
+                parsed = ''.join(page_content).replace('\n', '')
+
+                # print('page_content: ' , page_content)
+
+                if parsed != '' and 'CNPJ' in parsed:
+                    for x in range(number_of_pages):
+                        page = pdfReader.getPage(x)
+                        pdf = processa_texto(page)
+
+                        if pdf is not None:
+                            docPdf.setPdfInfo(pdf)
+                            if pdf['chave'] == '': pdf['chave'] = fileName
+                            self.processed.emit(pdf['numNF'], pdf['cnpj'], pdf['chave'], fileName)
+                        else:
+                            self.processed.emit(pdf['numNF'], pdf['cnpj'], fileName, fileName)
+                else:
+                    # print('processa imagem: ' , fileName)
+                    pdf = processa_imagem(fileName)
 
                     if pdf is not None:
                         docPdf.setPdfInfo(pdf)
+                        if pdf['chave'] == '': pdf['chave'] = fileName
                         self.processed.emit(pdf['numNF'], pdf['cnpj'], pdf['chave'], fileName)
-            else:
-                pdf = processa_imagem(fileName)
-
-                if pdf is not None:
-                    docPdf.setPdfInfo(pdf)
-                    self.processed.emit(pdf['numNF'], pdf['cnpj'], pdf['chave'], fileName)
+                    else:
+                        self.processed.emit(pdf['numNF'], pdf['cnpj'], fileName, fileName)
+            except:
+                # print("Erro ao ler PDF! - " + fileName)
+                self.processed.emit('Erro', page_content, fileName, '')
 
 
 class Ui_MainWindow(qtw.QMainWindow):
@@ -248,6 +256,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.actionExit = qtw.QAction("E&xit", self, shortcut="Ctrl+Q", triggered=self.close)
         self.btnProcessar.clicked.connect(self.inicia_extracao)
         self.btnLimpar.clicked.connect(self.limpar)
+        self.btnSalvar.clicked.connect(self.save_data_grid)
 
     def createMenus(self):
         self.menuAction.addAction(self.actionSelect_Folder)
@@ -347,6 +356,45 @@ class Ui_MainWindow(qtw.QMainWindow):
         """output csv"""
         self.dfPDF = self.dfPDF.drop_duplicates(subset='chave', keep='first')
         self.dfPDF.to_csv(fileNameOut, encoding='latin-1', sep = ';', index = False)
+
+    # Salva o grid todo
+    def save_data_grid(self):
+        """Obtêm o DataFrame dos Dados Processados"""
+        if self.tbvExtratacao.model() is not None:
+            """Inicializa DataFrame"""
+            # columns = ['numNF', 'cnpj', 'chave']
+            # data = {}
+            # df = pd.DataFrame(data, columns=columns)
+            df = pd.DataFrame()
+
+            # """Define o nome do arquivo pelo tipo de processamento"""
+            # caminho = self.extrai_caminho()
+            # fileNameOut = os.path.join(caminho,'DadosPDF.txt')
+
+            """Abre Dialogo de Salvar Arquivo"""
+            fileNameOut = qtw.QFileDialog.getSaveFileName(self, 'Save File', 'DadosPDF.txt', 'TXT files (*.txt)')
+
+            rows = self.tbvExtratacao.rowCount()
+            columns = self.tbvExtratacao.columnCount()
+
+            for i in range(rows):
+                for j in range(columns):
+                    if self.tbvExtratacao.item(i, j) is not None:
+                        df.loc[i, j] = str(self.tbvExtratacao.item(i, j).text())
+                    else:
+                        df.loc[i, j] = ''
+
+            """Rename multiple columns in one go with a larger dictionary"""
+            df = df.rename (columns={1 :  'numNF', 2 :  'cnpj', 3 :  'chave'})
+
+            """Resetando o index para juntar no concatenar"""
+            df = df.reset_index(drop=True) # drop=True remove o index anterior salvo pela função em uma nova coluna
+
+            """elimina coluna 0"""
+            df = df.drop(columns=[0])
+
+            """output csv"""
+            df.to_csv(fileNameOut[0], encoding='latin-1', sep = '\t', index = False)
 
     # Gera um DataFrame vazio
     def inicializa_data_frame(self):

@@ -50,7 +50,7 @@
      <string>Arquivos Disponíveis</string>
     </property>
    </widget>
-   <widget class="QLabel" name="lblTextoLido_2">
+   <widget class="QLabel" name="lblTextoLido">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -111,7 +111,7 @@
    <widget class="QCheckBox" name="chBoxNewOutputFile">
     <property name="geometry">
      <rect>
-      <x>165</x>
+      <x>235</x>
       <y>493</y>
       <width>170</width>
       <height>17</height>
@@ -119,6 +119,23 @@
     </property>
     <property name="text">
      <string>Sobreescreve arquivo de saída</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnSalvar">
+    <property name="geometry">
+     <rect>
+      <x>165</x>
+      <y>490</y>
+      <width>60</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Salvar</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>images/disk.png</normaloff>images/disk.png</iconset>
     </property>
    </widget>
   </widget>
