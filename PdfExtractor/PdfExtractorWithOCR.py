@@ -16,12 +16,14 @@ app_path = os.path.dirname(os.path.abspath(__file__))
 tesseract_path = os.path.join(app_path, 'Tesseract-OCR', 'tesseract.exe')
 tessdata = os.path.join(app_path, 'Tesseract-OCR', 'tessdata')
 
-if os.path.exists(tesseract_path):
-    #pytesseract.pytesseract.TesseractNotFoundError: tesseract is not installed or it's not in your path
-    pytesseract.pytesseract.tesseract_cmd = tesseract_path
-
-    #tessdata_dir_config = r'--tessdata-dir "<replace_with_your_tessdata_dir_path>"'
-    tessdata_dir_config = '--tessdata-dir ' + tessdata
+# if os.path.exists(tesseract_path):
+#     # print("Tesseract encontrado: ", tesseract_path)
+#
+#     #pytesseract.pytesseract.TesseractNotFoundError: tesseract is not installed or it's not in your path
+#     pytesseract.pytesseract.tesseract_cmd = tesseract_path
+#
+#     #tessdata_dir_config = r'--tessdata-dir "<replace_with_your_tessdata_dir_path>"'
+#     tessdata_dir_config = '--tessdata-dir ' + tessdata
 
 class DocPdf:
     def __init__(self):
@@ -65,10 +67,10 @@ class DocPdf:
 docPdf = DocPdf()
 
 def extrai_texto(texto, padrao):
-        textoNovoRegex = re.compile(padrao)
-        textoNovo = textoNovoRegex.search(texto)
+    textoNovoRegex = re.compile(padrao)
+    textoNovo = textoNovoRegex.search(texto)
 
-        return textoNovo
+    return textoNovo
 
 def limpa_texto(page_content):
     parsed = ''.join(page_content)
@@ -100,7 +102,7 @@ def convert_pdf_to_img(fileName):
 
 def processa_imagem(fileName):
     image = Image.new('RGBA', (20, 20))
-    pdf = {"numNF": "ERRO", "cnpj": "cnpj", "chave": fileName, "parsed": "parsed"}
+    pdf = {"numNF": "ERRO", "cnpj": "", "chave": '', "parsed": fileName}
 
     image = convert_pdf_to_img(fileName)
     if image is not None:
@@ -147,7 +149,23 @@ def processa_dados(parsed):
         else:
             cnpj = ''
 
-        chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})|(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})|(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})|(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})|(\d{44})')
+        # chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})|(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})|(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})|(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})|(\d{44})|(\d{24}) (\d{20})')
+        chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})')
+
+        if chave is None:
+            chave = extrai_texto(parsed, '(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})')
+
+        if chave is None:
+            chave = extrai_texto(parsed, '(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})')
+
+        if chave is None:
+            chave = extrai_texto(parsed, '(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})')
+
+        if chave is None:
+            chave = extrai_texto(parsed, '(\d{44})')
+
+        if chave is None:
+            chave = extrai_texto(parsed, '(\d{24}) (\d{20})')
 
         if chave is not None:
             chave = chave.group().replace('.', '').replace(' ', '').replace('\n', '')
@@ -168,41 +186,46 @@ class Worker(qtc.QObject):
             fileName = os.path.join(data_path, item)
 
             pdf_file = open(fileName, 'rb')
+            pdfReader = PyPDF2.PdfFileReader(fileName, strict=False)
+            number_of_pages = pdfReader.getNumPages()
 
             try:
-                pdfReader = PyPDF2.PdfFileReader(fileName, strict=False)
-                number_of_pages = pdfReader.getNumPages()
-
                 page = pdfReader.getPage(0)
-                page_content = page.extractText()
-                parsed = ''.join(page_content).replace('\n', '')
+            except:
+                value += "Erro ao ler PDF! - " + fileName + '\r\n'
+                value += '=========================================================\r\n'
+                self.tc.SetValue(value)
 
-                # print('page_content: ' , page_content)
+            page_content = page.extractText()
+            parsed = ''.join(page_content).replace('\n', '')
 
-                if parsed != '' and 'CNPJ' in parsed:
-                    for x in range(number_of_pages):
-                        page = pdfReader.getPage(x)
-                        pdf = processa_texto(page)
+            # print('page_content: ' , page_content)
 
-                        if pdf is not None:
-                            docPdf.setPdfInfo(pdf)
-                            if pdf['chave'] == '': pdf['chave'] = fileName
-                            self.processed.emit(pdf['numNF'], pdf['cnpj'], pdf['chave'], fileName)
-                        else:
-                            self.processed.emit(pdf['numNF'], pdf['cnpj'], fileName, fileName)
-                else:
-                    # print('processa imagem: ' , fileName)
-                    pdf = processa_imagem(fileName)
+            if parsed != '' and 'CNPJ' in parsed:
+                for x in range(number_of_pages):
+                    page = pdfReader.getPage(x)
+                    pdf = processa_texto(page)
 
                     if pdf is not None:
                         docPdf.setPdfInfo(pdf)
-                        if pdf['chave'] == '': pdf['chave'] = fileName
+                        if pdf['chave'] == '': pdf['chave'] = 'Erro'
                         self.processed.emit(pdf['numNF'], pdf['cnpj'], pdf['chave'], fileName)
                     else:
-                        self.processed.emit(pdf['numNF'], pdf['cnpj'], fileName, fileName)
-            except:
-                # print("Erro ao ler PDF! - " + fileName)
-                self.processed.emit('Erro', page_content, fileName, '')
+                        self.processed.emit('Erro', '', '', fileName)
+            else:
+                # print('processa imagem: ' , fileName)
+                pdf = processa_imagem(fileName)
+
+                if pdf is not None:
+                    docPdf.setPdfInfo(pdf)
+
+                    if pdf['chave'] == '':
+                        pdf['numNF'] = 'Erro'
+                        pdf['cnpj'] = ''
+
+                    self.processed.emit(pdf['numNF'], pdf['cnpj'], pdf['chave'], fileName)
+                else:
+                    self.processed.emit('Erro', '', '', fileName)
 
 
 class Ui_MainWindow(qtw.QMainWindow):
@@ -211,7 +234,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     pdf_requested = qtc.pyqtSignal(str, list)
 
-    columns = ['numNF', 'cnpj', 'chave']
+    columns = ['numNF', 'cnpj', 'chave', 'fileName']
     dfPDF = pd.DataFrame(columns=columns)
 
     # Configura interface
@@ -301,8 +324,8 @@ class Ui_MainWindow(qtw.QMainWindow):
     def inicia_extracao(self):
         """Inicializa Tabela de resultados"""
         if self.process_list:
-            self.tbvExtratacao.setColumnCount(4)
-            self.tbvExtratacao.setHorizontalHeaderLabels(['#', 'numNF', 'cnpj', 'chave'])
+            self.tbvExtratacao.setColumnCount(5)
+            self.tbvExtratacao.setHorizontalHeaderLabels(['#', 'numNF', 'cnpj', 'chave', 'fileName'])
             self.tbvExtratacao.horizontalHeader().setSectionResizeMode(qtw.QHeaderView.ResizeToContents)
             self.tbvExtratacao.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
 
@@ -320,9 +343,12 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.btn_del.clicked.connect(self.handleButtonClicked)
         self.tbvExtratacao.setCellWidget(row,0,self.btn_del)
 
+        # print(fileName)
+
         self.tbvExtratacao.setItem(row, 1, qtw.QTableWidgetItem(numNF))
         self.tbvExtratacao.setItem(row, 2, qtw.QTableWidgetItem(cnpj))
         self.tbvExtratacao.setItem(row, 3, qtw.QTableWidgetItem(chave))
+        self.tbvExtratacao.setItem(row, 4, qtw.QTableWidgetItem(fileName))
 
         """Salva no arquivo a linha obtida"""
         self.salvar_arquivo(numNF, cnpj, chave, fileName)
@@ -349,9 +375,9 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         if os.path.exists(fileNameOut) and not self.chBoxNewOutputFile.isChecked():
             self.dfPDF = pd.read_csv(fileNameOut, encoding='ISO-8859-1', sep=';')
-            self.dfPDF.loc[len(self.dfPDF)]= [str(numNF), str(cnpj), str(chave)]
+            self.dfPDF.loc[len(self.dfPDF)]= [str(numNF), str(cnpj), str(chave), fileName]
         else:
-            self.dfPDF.loc[len(self.dfPDF)]= [str(numNF), str(cnpj), str(chave)]
+            self.dfPDF.loc[len(self.dfPDF)]= [str(numNF), str(cnpj), str(chave), fileName]
 
         """output csv"""
         self.dfPDF = self.dfPDF.drop_duplicates(subset='chave', keep='first')
@@ -385,7 +411,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         df.loc[i, j] = ''
 
             """Rename multiple columns in one go with a larger dictionary"""
-            df = df.rename (columns={1 :  'numNF', 2 :  'cnpj', 3 :  'chave'})
+            df = df.rename (columns={1 :  'numNF', 2 :  'cnpj', 3 :  'chave', 4 :  'fileName'})
 
             """Resetando o index para juntar no concatenar"""
             df = df.reset_index(drop=True) # drop=True remove o index anterior salvo pela função em uma nova coluna
@@ -399,7 +425,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     # Gera um DataFrame vazio
     def inicializa_data_frame(self):
         """Inicializa DataFrame"""
-        columns = ['numNF', 'cnpj', 'chave']
+        columns = ['numNF', 'cnpj', 'chave', 'fileName']
         data = {}
         self.dfPDF = pd.DataFrame(data, columns=columns)
 
@@ -433,7 +459,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         if self.chBoxNewOutputFile.isChecked():
             with open(caminho + "TextoExtraido.txt", "w") as f:
                 wr = csv.writer(f, delimiter=';')
-                wr.writerow(['numNF', 'cnpj', 'chave'])
+                wr.writerow(['numNF', 'cnpj', 'chave', 'fileName'])
 
 
     # Deletar linha do grid
