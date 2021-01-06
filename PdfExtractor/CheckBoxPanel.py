@@ -36,8 +36,11 @@ class CheckBoxPanel(wx.lib.scrolledpanel.ScrolledPanel):
         """"""
         if self.number_of_buttons > 0: self.destroyCheckBoxesList()
 
-        pos_y = 10
-        self.bSizer = wx.BoxSizer( wx.VERTICAL )
+        chkAll = wx.CheckBox(self, label='Selecionar todos', name='chkAll', pos=(10, 10))
+        chkAll.Bind(wx.EVT_CHECKBOX, self.changeState)
+        self.widgetSizer.Add(chkAll, 0, wx.ALL, 5)
+
+        pos_y = 20
         for item in self.text_list:
                 self.addWidget(item, pos_y)
                 pos_y += 20
@@ -50,6 +53,36 @@ class CheckBoxPanel(wx.lib.scrolledpanel.ScrolledPanel):
         cb = wx.CheckBox(self, label=texto, name=name, pos=(10, pos_y))
         cb.Bind(wx.EVT_CHECKBOX, self.update)
         self.widgetSizer.Add(cb, 0, wx.ALL, 5)
+
+    #----------------------------------------------------------------------
+    def changeState(self, e):
+        """"""
+        sender = e.GetEventObject()
+        isChecked = sender.GetValue()
+        nome = sender.GetLabel()
+
+        if isChecked:
+            # print('Insere item: ', nome)
+            children = self.widgetSizer.GetChildren()
+            for child in children:
+                widget = child.GetWindow()
+
+                if(widget.GetName() != 'chkAll' and widget.GetValue() == False):
+                    # print('Nome:', widget.GetName(), '- Texto:', widget.GetLabel(), '- State:', widget.GetValue())
+                    widget.SetValue(True)
+                    self.process_list.append( widget.GetLabel())
+        else:
+            # print('Remolve item: ', nome)
+            children = self.widgetSizer.GetChildren()
+            for child in children:
+                widget = child.GetWindow()
+
+                if(widget.GetName() != 'chkAll' and widget.GetValue() == True):
+                    # print('Nome:', widget.GetName(), '- Texto:', widget.GetLabel(), '- State:', widget.GetValue())
+                    widget.SetValue(False)
+                    if widget.GetLabel() in self.process_list: self.process_list.remove(widget.GetLabel())
+
+        # print(self.process_list)
 
     #----------------------------------------------------------------------
     def update(self, e):
@@ -70,6 +103,10 @@ class CheckBoxPanel(wx.lib.scrolledpanel.ScrolledPanel):
         """"""
         while(self.number_of_buttons > 0):
             self.removeWidget()
+
+        if self.widgetSizer.GetChildren():
+            self.widgetSizer.Hide(0)
+            self.widgetSizer.Remove(0)
 
     #----------------------------------------------------------------------
     def removeWidget(self):

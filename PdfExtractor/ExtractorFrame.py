@@ -1,11 +1,24 @@
 import wx, os, re
 import time
 import PyPDF2
-from pdf2image import convert_from_path, convert_from_bytes
+# from pdf2image import convert_from_path, convert_from_bytes
+import ghostscript
+import locale
 from PIL import Image  # Importando o módulo Pillow para abrir a imagem no script
 import pytesseract  # Módulo para a utilização da tecnologia OCR
 from threading import *
 from CheckBoxPanel import CheckBoxPanel
+
+app_path = os.path.dirname(os.path.abspath(r'.'))
+tesseract_path = os.path.join(app_path, 'Tesseract-OCR', 'tesseract.exe')
+tessdata = os.path.join(app_path, 'Tesseract-OCR', 'tessdata')
+
+if os.path.exists(tesseract_path):
+    #pytesseract.pytesseract.TesseractNotFoundError: tesseract is not installed or it's not in your path
+    pytesseract.pytesseract.tesseract_cmd = tesseract_path
+
+    #tessdata_dir_config = r'--tessdata-dir "<replace_with_your_tessdata_dir_path>"'
+    tessdata_dir_config = '--tessdata-dir ' + tessdata
 
 """Define notification event for thread completion"""
 EVT_RESULT_ID = 100
@@ -45,7 +58,7 @@ class ThreadExtract(Thread):
 
             self._main_window.progress_bar.SetValue(progress_bar_step)
             progress_bar_step += 1
-            self._main_window.SetStatusText(item)
+            self._main_window.SetStatusText('Processando o arquivo ' + item)
 
             fileName = os.path.join(self._main_window.directory, item)
             pdf_file = open(fileName, 'rb')
@@ -75,16 +88,11 @@ class ThreadExtract(Thread):
                     # value += '=========================================================\r\n'
                     self._main_window.tc.SetValue(value)
             else:
-                print(parsed)
-                value = self._main_window.tc.GetValue()
-                value += 'processa imagem: ' + fileName + '\r\n'
-                value += '=========================================================\r\n'
                 pdf = self.processa_imagem(fileName)
 
                 value = self._main_window.tc.GetValue()
                 if pdf['chave'] == '': pdf['chave'] = 'Erro'
                 value += pdf['chave'] + '\t' + fileName + '\r\n'
-                # value += '=========================================================\r\n'
                 self._main_window.tc.SetValue(value)
 
             wx.Yield()
@@ -108,19 +116,13 @@ class ThreadExtract(Thread):
     def processa_imagem(self, fileName):
         pdf = {'chave': 'ERRO', 'fileName': fileName}
 
-        image = self.convert_pdf_to_img(fileName)
+        img_file_path = self.convert_pdf_to_img(fileName)
+        image = Image.open(img_file_path)
         if image is not None:
-            # try:
             texto = pytesseract.image_to_string(image)
             pdf = self.processa_dados(texto)
-            # except:
-            #     value = self._main_window.tc.GetValue()
-            #     value += 'Erro em processa_imagem\r\n'
-            #     self._main_window.tc.SetValue(value)
-        else:
-            value = self._main_window.tc.GetValue()
-            value += 'Erro em processa_imagem\r\n'
-            self._main_window.tc.SetValue(value)
+
+        image.close()
 
         return pdf
 
@@ -164,27 +166,33 @@ class ThreadExtract(Thread):
 
         return textoNovo
 
-    def convert_pdf_to_img(self, fileName):
-        image = Image.new('RGBA', (20, 20))
+    def pdf2jpeg(self, pdf_input_path, jpeg_output_path):
+        args = []
+        args = ["pef2jpeg", # actual value doesn't matter
+                "-dNOPAUSE",
+                "-sDEVICE=jpeg",
+                "-dJPEGQ=100",
+                "-r144",
+                "-sOutputFile=" + jpeg_output_path,
+                pdf_input_path]
+
+        encoding = locale.getpreferredencoding()
+        args = [a.encode(encoding) for a in args]
+
         try:
-            dpi = 300 # dots per inch
-            pages = convert_from_path(fileName ,dpi )
-
-            if pages is not None:
-                # print('imagem convertida 300 dpi: ' , fileName)
-                image = pages[0]
+            ghostscript.Ghostscript(*args)
+            ghostscript.cleanup()
         except:
-            try:
-                dpi = 200 # dots per inch
-                pages = convert_from_path(fileName ,dpi )
+            print("Erro", ghostscript.GhostscriptError)
 
-                if pages is not None:
-                    # print('imagem convertida 200 dpi: ' , fileName)
-                    image = pages[0]
-            except:
-                print('Error ao converter o PDF em imagem ', fileName)
+    def convert_pdf_to_img(self, fileName):
+        img_file_path = "{}jpg".format(fileName[:-3])
 
-        return image
+        self.pdf2jpeg(fileName, img_file_path,)
+        if os.path.exists(img_file_path):
+            return img_file_path
+        else:
+            return ''
 
 class ExtractorFrame(wx.Frame):
     directory = ''
@@ -198,11 +206,11 @@ class ExtractorFrame(wx.Frame):
         wx.Frame.__init__(self,parent,id,title,size=(1024,500), style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
 
         """Create a panel for text"""
-        self.panel1 = wx.Panel(self,-1,size=(725,418), pos=(0,0), style=wx.SIMPLE_BORDER)
+        self.panel1 = wx.Panel(self,-1,size=(725,415), pos=(0,0), style=wx.SIMPLE_BORDER)
         self.panel1.SetBackgroundColour('#FFFFFF')
 
         """Create a customized panel of checkboxes"""
-        self.panel2 = CheckBoxPanel(self, sizePanel=(283,403), posPanel=(725,0))
+        self.panel2 = CheckBoxPanel(self, sizePanel=(293,415), posPanel=(725,0))
         self.panel2.SetBackgroundColour('#A0A0A0')
 
         """create a menu bar"""
@@ -213,7 +221,7 @@ class ExtractorFrame(wx.Frame):
         # self.SetStatusText('PDF Extractor')
 
         """create a text box"""
-        self.tc = wx.TextCtrl(self.panel1, -1, size=(725,403), style=wx.TE_MULTILINE)
+        self.tc = wx.TextCtrl(self.panel1, -1, size=(725,415), style=wx.TE_MULTILINE)
 
         self.textbox = wx.BoxSizer(wx.VERTICAL)
         self.textbox.Add(self.tc,proportion=1,flag = wx.EXPAND)
@@ -221,7 +229,7 @@ class ExtractorFrame(wx.Frame):
         self.panel1.SetSizer(self.textbox)
 
         """create a progress bar"""
-        self.progress_bar = wx.Gauge(self, wx.ID_ANY, 100, (0, 403), (1007, 15))
+        self.progress_bar = wx.Gauge(self, wx.ID_ANY, 100, (0, 415), (1024, 15))
 
         """Set up event handler for any worker thread results"""
         EVT_RESULT(self, self.on_result)
@@ -231,7 +239,7 @@ class ExtractorFrame(wx.Frame):
 
     def makeMenuBar(self):
         """Obtêm o caminho dos icones"""
-        images_path = os.path.abspath(r'.\images')
+        images_path = os.path.abspath(r'.\icones')
 
         """Make a file menu with Open and Exit items"""
         fileMenu = wx.Menu()
@@ -258,8 +266,8 @@ class ExtractorFrame(wx.Frame):
             getItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-execute.png')))
 
         stopItem = editMenu.Append(wx.ID_STOP, "Para Extração\tCtrl+T", "Para a extração dos textos do PDF")
-        if os.path.exists(os.path.join(images_path, 'gtk-clear.png')):
-            cleanItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'gtk-clear.png')))
+        if os.path.exists(os.path.join(images_path, 'cross.png')):
+            stopItem.SetBitmap(wx.Bitmap(os.path.join(images_path, 'cross.png')))
 
         cleanItem = editMenu.Append(wx.ID_CLEAR, "Limpa Texto\tCtrl+L", "Limpa o texto obtido")
         if os.path.exists(os.path.join(images_path, 'gtk-clear.png')):
@@ -283,7 +291,7 @@ class ExtractorFrame(wx.Frame):
 
     def onOpen(self, event):
         """Browse for directory"""
-        dialog = wx.DirDialog (None, "Escolha a pasta com as imagens", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
+        dialog = wx.DirDialog (None, "Escolha a pasta com os PDFs", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
         if dialog.ShowModal() == wx.ID_OK:
             self.directory = dialog.GetPath()
             self.onView()
