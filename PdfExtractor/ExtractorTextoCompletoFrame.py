@@ -77,23 +77,19 @@ class ThreadExtract(Thread):
             except:
                 print("Erro ao ler PDF! - " + fileName + '\r\n')
 
+            texto = ''
             if parsed != '' and re.findall('\w+',parsed) != '':
                 for x in range(number_of_pages):
                     page = pdfReader.getPage(x)
-                    pdf = self.processa_texto(page)
-
-                    value = self._main_window.tc.GetValue()
-                    if pdf['chave'] == '': pdf['chave'] = 'Erro'
-                    value += pdf['chave'] + '\t' + fileName + '\r\n'
-                    # value += '=========================================================\r\n'
-                    self._main_window.tc.SetValue(value)
+                    texto = self.processa_texto(page)
             else:
-                pdf = self.processa_imagem(fileName)
+                texto = self.processa_imagem(fileName)
 
-                value = self._main_window.tc.GetValue()
-                if pdf['chave'] == '': pdf['chave'] = 'Erro'
-                value += pdf['chave'] + '\t' + fileName + '\r\n'
-                self._main_window.tc.SetValue(value)
+            value = self._main_window.tc.GetValue()
+            value += '==>' + fileName + '\r\n'
+            value += texto + '\r\n'
+            value += '=======================================================================================\r\n'
+            self._main_window.tc.SetValue(value)
 
             wx.Yield()
             time.sleep(1)
@@ -109,60 +105,25 @@ class ThreadExtract(Thread):
     def processa_texto(self, page):
         page_content = page.extractText()
         parsed = self.limpa_texto(page_content)
-        pdf = self.processa_dados(parsed)
 
-        return pdf
+        return parsed
 
     def processa_imagem(self, fileName):
-        pdf = {'chave': 'ERRO', 'fileName': fileName}
-
+        texto = ''
         img_file_path = self.convert_pdf_to_img(fileName)
         image = Image.open(img_file_path)
         if image is not None:
             texto = pytesseract.image_to_string(image)
-            pdf = self.processa_dados(texto)
 
         image.close()
 
-        return pdf
+        return texto
 
     def limpa_texto(self, page_content):
         parsed = ''.join(page_content)
         parsed = re.sub(' \n', '', parsed)
 
         return parsed
-
-    def processa_dados(self, parsed):
-        # chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})|(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})|(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})|(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})|(\d{44})|(\d{24}) (\d{20})')
-        chave = self.extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{44})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{24}) (\d{20})')
-
-        if chave is not None:
-            chave = chave.group().replace('.', '').replace(' ', '').replace('\n', '')
-        else:
-            chave = ''
-
-        pdf_info = {'chave': chave, 'fileName': parsed}
-
-        return pdf_info
-
-    def extrai_texto(self, texto, padrao):
-        textoNovoRegex = re.compile(padrao)
-        textoNovo = textoNovoRegex.search(texto)
 
         return textoNovo
 
@@ -194,7 +155,7 @@ class ThreadExtract(Thread):
         else:
             return ''
 
-class ExtractorFrame(wx.Frame):
+class ExtractorTextoCompletoFrame(wx.Frame):
     directory = ''
     process_list = list()
 
@@ -331,10 +292,10 @@ class ExtractorFrame(wx.Frame):
         number_of_process = len(self.process_list)
         self.progress_bar.SetRange(number_of_process)
 
-        value = self.tc.GetValue()
-        if value == '':
-            value += 'chave\tnome do arquivo\r\n'
-            self.tc.SetValue(value)
+        # value = self.tc.GetValue()
+        # if value == '':
+        #     value += 'chave\tnome do arquivo\r\n'
+        #     self.tc.SetValue(value)
 
         if not self.thread:
             self.thread = ThreadExtract(self)
