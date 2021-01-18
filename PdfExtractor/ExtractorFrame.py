@@ -113,65 +113,12 @@ class ThreadExtract(Thread):
 
         return pdf
 
-    def processa_imagem(self, fileName):
-        pdf = {'chave': 'ERRO', 'fileName': fileName}
-
-        img_file_path = self.convert_pdf_to_img(fileName)
-        image = Image.open(img_file_path)
-        if image is not None:
-            texto = pytesseract.image_to_string(image)
-            pdf = self.processa_dados(texto)
-
-        image.close()
-
-        return pdf
-
-    def limpa_texto(self, page_content):
-        parsed = ''.join(page_content)
-        parsed = re.sub(' \n', '', parsed)
-
-        return parsed
-
-    def processa_dados(self, parsed):
-        # chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})|(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})|(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})|(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})|(\d{44})|(\d{24}) (\d{20})')
-        chave = self.extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{44})')
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, '(\d{24}) (\d{20})')
-
-        if chave is not None:
-            chave = chave.group().replace('.', '').replace(' ', '').replace('\n', '')
-        else:
-            chave = ''
-
-        pdf_info = {'chave': chave, 'fileName': parsed}
-
-        return pdf_info
-
-    def extrai_texto(self, texto, padrao):
-        textoNovoRegex = re.compile(padrao)
-        textoNovo = textoNovoRegex.search(texto)
-
-        return textoNovo
-
     def pdf2jpeg(self, pdf_input_path, jpeg_output_path):
-        args = []
         args = ["pef2jpeg", # actual value doesn't matter
                 "-dNOPAUSE",
                 "-sDEVICE=jpeg",
                 "-dJPEGQ=100",
+                "-dGrayImageResolution=400",
                 "-r144",
                 "-sOutputFile=" + jpeg_output_path,
                 pdf_input_path]
@@ -193,6 +140,82 @@ class ThreadExtract(Thread):
             return img_file_path
         else:
             return ''
+
+    def carrega_imagem_cortada(self, fileName):
+        image = Image.open(fileName)
+        width, height = image.size
+
+        croppedIm = image.crop((0, 0, width, 400))
+        croppedIm.save(fileName)
+
+        return croppedIm
+
+    def processa_imagem(self, fileName):
+        pdf = {'chave': 'ERRO', 'fileName': fileName}
+
+        img_file_path = self.convert_pdf_to_img(fileName)
+        image = self.carrega_imagem_cortada(img_file_path)
+        if image is not None:
+            texto = pytesseract.image_to_string(image)
+            pdf = self.processa_dados(texto)
+
+        image.close()
+
+        if os.path.exists(img_file_path):
+            try:
+                os.remove(img_file_path)
+            except OSError as e:
+                print(e)
+            else:
+                print("File is deleted successfully")
+
+        return pdf
+
+    def limpa_texto(self, page_content):
+        parsed = ''.join(page_content)
+        parsed = re.sub(' \n', '', parsed)
+
+        return parsed
+
+    def processa_dados(self, parsed):
+        # chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})|(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})|(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})|(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})|(\d{44})|(\d{24}) (\d{20})')
+        chave = self.extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})')
+
+        if chave is None:
+            chave = self.extrai_texto(parsed, '(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})')
+
+        if chave is None:
+            chave = self.extrai_texto(parsed, '(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})')
+
+        if chave is None:
+            chave = self.extrai_texto(parsed, '(\d{44})')
+
+        if chave is None:
+            chave = self.extrai_texto(parsed, '(\d{24}) (\d{20})')
+
+        if chave is None:
+            chave = self.extrai_texto(parsed, '(\d{2})([,|\.])(\d{4})([,|\.])(\d{2})([,|\.])(\d{3})([,|\.])(\d{3})/(\d{4})-(\d{2})-(\d{2})-(\d{3})-(\d{3})([,|\.])(\d{3})([,|\.])(\d{3})-(\d{3})([,|\.])(\s?)(\d{3})([,|\.])(\d{3})-(\d{1})')
+
+        if chave is None:
+            chave = self.extrai_texto(parsed, '(\d{4})(\s?)(\d{4})(\s?)(\d{4})(\s?)(\d{4})(\s?)(\d{4})(\s?)(\d{4})(\s?)(\d{4})(\s?)(\d{4})(\s?)(\d{4})(\s?)(\d{4})(\s?)(\d{4})')
+
+        if chave is None:
+            chave = self.extrai_texto(parsed, '(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})')
+
+        if chave is not None:
+            chave = chave.group().replace('.', '').replace(',', '').replace('/', '').replace('-', '').replace(' ', '').replace('\n', '')
+        else:
+            chave = ''
+
+        pdf_info = {'chave': chave, 'fileName': parsed}
+
+        return pdf_info
+
+    def extrai_texto(self, texto, padrao):
+        textoNovoRegex = re.compile(padrao)
+        textoNovo = textoNovoRegex.search(texto)
+
+        return textoNovo
 
 class ExtractorFrame(wx.Frame):
     directory = ''

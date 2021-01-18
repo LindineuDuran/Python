@@ -117,6 +117,14 @@ class ThreadExtract(Thread):
 
         image.close()
 
+        if os.path.exists(img_file_path):
+            try:
+                os.remove(img_file_path)
+            except OSError as e:
+                print(e)
+            else:
+                print("File is deleted successfully")
+
         return texto
 
     def limpa_texto(self, page_content):
