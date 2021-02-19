@@ -108,10 +108,20 @@ class ThreadExtract(Thread):
 
         return parsed
 
+    def carrega_imagem_cortada(self, fileName):
+        image = Image.open(fileName)
+        width, height = image.size
+
+        croppedIm = image.crop((0, 0, width, 700))
+        croppedIm.save(fileName)
+
+        image = Image.open(fileName)
+        return image
+
     def processa_imagem(self, fileName):
         texto = ''
         img_file_path = self.convert_pdf_to_img(fileName)
-        image = Image.open(img_file_path)
+        image = self.carrega_imagem_cortada(img_file_path)
         if image is not None:
             texto = pytesseract.image_to_string(image)
 
@@ -135,14 +145,12 @@ class ThreadExtract(Thread):
 
         return textoNovo
 
-    def pdf2jpeg(self, pdf_input_path, jpeg_output_path):
-        args = []
-        args = ["pef2jpeg", # actual value doesn't matter
+    def pdf2png(self, pdf_input_path, png_output_path):
+        args = ["pdf2png", # actual value doesn't matter
                 "-dNOPAUSE",
-                "-sDEVICE=jpeg",
-                "-dJPEGQ=100",
-                "-r144",
-                "-sOutputFile=" + jpeg_output_path,
+                "-sDEVICE=pngmono",
+                "-r300",
+                "-sOutputFile=" + png_output_path,
                 pdf_input_path]
 
         encoding = locale.getpreferredencoding()
@@ -155,9 +163,9 @@ class ThreadExtract(Thread):
             print("Erro", ghostscript.GhostscriptError)
 
     def convert_pdf_to_img(self, fileName):
-        img_file_path = "{}jpg".format(fileName[:-3])
+        img_file_path = "{}png".format(fileName[:-3])
 
-        self.pdf2jpeg(fileName, img_file_path,)
+        self.pdf2png(fileName, img_file_path,)
         if os.path.exists(img_file_path):
             return img_file_path
         else:
@@ -273,7 +281,7 @@ class ExtractorTextoCompletoFrame(wx.Frame):
         fdlg = wx.FileDialog(None, "Entre com o caminho para o arquivo de resultado", "", "", "text files(*.txt)|*.*", wx.FD_SAVE)
 
         if fdlg.ShowModal() == wx.ID_OK:
-            self.save_path = fdlg.GetPath() + ".txt"
+            self.save_path = self.define_extensao_arquivo(fdlg.GetPath())
 
             extractedFile = open(self.save_path, 'w', encoding="utf-8")
             extractedFile.write(value+'\r\n')
@@ -333,3 +341,10 @@ class ExtractorTextoCompletoFrame(wx.Frame):
     def onExit(self, event):
         """Close the frame, terminating the application."""
         self.Close(True)
+
+    def define_extensao_arquivo(self, nome_arquivo):
+        extensao = nome_arquivo[-4::]
+
+        if extensao != '.txt': nome_arquivo += ".txt"
+
+        return nome_arquivo
