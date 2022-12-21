@@ -1,0 +1,1 @@
+@py.exe D:\Documents\Python\manipula_documentos_excel.py %*

@@ -1,0 +1,1 @@
+@py.exe C:\Users\lindineu.duran\Documents\Python\argv.py 1 2 3 a b c "python" "script" %*
