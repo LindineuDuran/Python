@@ -5,6 +5,7 @@ import pandas as pd
 
 
 class TableModel(QtCore.QAbstractTableModel):
+
     def __init__(self, data):
         super(TableModel, self).__init__()
         self._data = data
@@ -31,6 +32,7 @@ class TableModel(QtCore.QAbstractTableModel):
 
 
 class MainWindow(QtWidgets.QMainWindow):
+
     def __init__(self):
         super().__init__()
 

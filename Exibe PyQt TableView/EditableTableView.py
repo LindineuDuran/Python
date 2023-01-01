@@ -11,9 +11,11 @@ from PyQt5.QtGui import QIcon
 import re
 
 def dataframe():
-    lst = [['tom', 'reacher', 'True'], ['krish', 'pete', 'True'],
-           ['nick', 'wilson', 'True'], ['juli', 'williams', 'True']]
-    df = pd.DataFrame(lst, columns =['FName', 'LName', 'Student?'], dtype = float)
+    lst = [['tom', 'reacher', 'True', 12, 4, 5, None, 1],
+           ['krish', 'pete', 'True', 7, 2, 54, 3, None],
+           ['nick', 'wilson', 'True', 20, 16, 11, 3, 8],
+           ['juli', 'williams', 'True', 14, 3, None, 2, 6]]
+    df = pd.DataFrame(lst, columns =['FName', 'LName', 'Student?','Nota1', 'Nota2', 'Nota3', 'Nota4', 'Nota5'])
     return df
 
 class Delegate(QtWidgets.QItemDelegate):
@@ -92,22 +94,31 @@ class MyWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setGeometry(300, 200 ,600, 400)
+        self.setGeometry(300, 200 ,480, 250)
         self.setWindowTitle('Test')
         self.initUI()
-
 
     def show_data(self):
         choices = ['True', 'False']
         self.model = PandasModel(dataframe())
         self.table_data.setModel(self.model)
         self.table_data.setItemDelegateForColumn(2, Delegate(self,choices))
+
         ##make combo boxes editable with a single-click:
         for row in range(5):
             self.table_data.openPersistentEditor(self.model.index(row, 2))
 
+        self.table_data.resizeColumnsToContents()
+
     def print_data(self):
+        # Print the DataFrame
         print(self.table_data.model()._data)
+
+        # return the dtype of each column
+        result = dataframe().dtypes
+
+        # Print the result
+        print(result)
 
     def initUI(self):
 
@@ -120,11 +131,10 @@ class MyWindow(QWidget):
         self.btn_show_table.clicked.connect(self.show_data)
 
         self.table_data = QTableView()
-        #self.table_result = QTableView()
+        self.table_data.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
 
         hbox1 = QHBoxLayout()
         hbox1.addWidget(welcom)
-
 
         vbox2 = QVBoxLayout()
         vbox2.addWidget(self.btn_show_table)
@@ -132,7 +142,6 @@ class MyWindow(QWidget):
 
         vbox3 = QVBoxLayout()
         vbox3.addWidget(self.table_data)
-        #vbox3.addWidget(self.table_result)
 
         hbox2 = QHBoxLayout()
         hbox2.addLayout(vbox2)
@@ -144,7 +153,6 @@ class MyWindow(QWidget):
 
         self.setLayout(vbox1)
         self.show()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

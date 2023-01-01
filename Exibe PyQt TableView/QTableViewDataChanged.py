@@ -3,13 +3,17 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+
 class Window(QTableView):
+
     def __init__(self, model):
 
         super().__init__()
         self.setModel(model)
 
+
 class Model(QAbstractTableModel):
+
     def __init__(self):
         super().__init__()
 
@@ -59,6 +63,7 @@ class Model(QAbstractTableModel):
         return None
 
     def headerData(self, col, orientation, role):
+
         return None
 
 
