@@ -65,7 +65,7 @@ class ConsultaBanco:
         # Conecta ao Banco de Dados
         conn = sqlite3.connect(self.connect_string)
         cursor = conn.cursor()
-        
+
         valor = ""
         for row in cursor.execute(sql):
             if row[0] != "":
