@@ -1,0 +1,1 @@
+pyinstaller frm_youtube_downloader.py -y -w --onefile -r ffmpeg.exe

@@ -102,11 +102,9 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate(
-            "MainWindow", "Youtube Downloader"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Youtube Downloader"))
         self.linkLabel.setText(_translate("MainWindow", "URL link:"))
-        self.destinyLabel.setText(_translate(
-            "MainWindow", "File Destination:"))
+        self.destinyLabel.setText(_translate("MainWindow", "File Destination:"))
         self.folderButton.setText(_translate("MainWindow", "..."))
         self.downloadButton.setText(_translate("MainWindow", "Download"))
         self.videoButton.setText(_translate("MainWindow", "Video"))
@@ -198,9 +196,9 @@ class Ui_MainWindow(object):
 
         file_without_ext = os.path.splitext(source)[0]
 
-        result = subprocess.run(['ffmpeg.exe', '-y', '-i', source, os.path.join(
-            path, file_without_ext + '.mp3')], shell=True, check=True)
+        self.showdialog("Info!!!", "ffmpeg path: " + ffmpeg)
 
+        result = subprocess.run([ffmpeg, '-y', '-i', source, os.path.join(path, file_without_ext + '.mp3')], shell=True, check=True)
 
 if __name__ == "__main__":
     import sys
