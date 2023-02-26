@@ -50,8 +50,6 @@ class ThreadExtract(Thread):
         progress_bar_step = 1
 
         """Processa os PDFs"""
-        # self._main_window.directory = r'C:\Users\lindineu.duran\Downloads\PDFs - MELI'
-        # self._main_window.process_list = ['2310-9699194331-4500183752.pdf','2311-9699194331-4500183752.pdf','2312 -  9699194331 - 45001837520.pdf','2313 - 9699194331 -  45001837520.pdf','231-9600021336-4500191333.pdf','233-9600021336-4500195329.pdf','23556 - 9699195478 - 4500201296.pdf','245-9600021370-4500195203.pdf','265-9699194964-4500194366.pdf','2714 - 9699193852 - 4500200622.pdf','298-9699194964-4500198269.pdf','314-9699194964-4500199253.pdf','32.588.153-9600021872-4500199452.pdf','32.588.310-9600021872-4500199453.pdf','3828 - 9699194245 - 4500194073.pdf','3829 - 9699194245 - 4500193982.pdf','3843 - 9699194245 - 4500194059.pdf','3846 - 9699194245 - 4500194000.pdf','542-9699194099-4500187438.pdf','599 -  9699194520  - 4500200706.pdf','63609-9600021505-4500194058.pdf','63611-9600021505-4500194057.pdf','64195-9600021505-4500198344.pdf','661 - 9600021270 - 4500199607.pdf','662 - 9600021270 - 4500200063.pdf','664.157-9600019604-4500194071.pdf','664156-9600019604-4500194075.pdf','664-9600021270-4500195870.pdf','665-9600021270-4500195976.pdf','667535 - 9600019604 - 4500198337.pdf','786 - 9699195435 - 4500201960 -.pdf','88 - 9699193256 - 4500202070.pdf','89 - 9699193256 - 4500199756.pdf','931-9699191508-4500194805.pdf','9821-9699191902-4500193888.pdf','9826-9699194675-4500194140.pdf','9830-9699191902-4500196225.pdf','9831-9699191902-4500196091.pdf','9832-9699191902-4500196092.pdf','9835-9699191902-4500196229.pdf','9836-9699191902-4500196122.pdf','9837-9699191902-4500196095.pdf','9838-9699191902-4500196125.pdf','9843-9699191902-4500196240.pdf','9844-9699191902-4500196174.pdf','9845-9699191902-4500196085.pdf','9849-9699191902-4500196099.pdf','9853-9699191902-4500196078.pdf']
         for item in self._main_window.process_list:
             if self.want_abort:
                 """Use a result of None to acknowledge the abort"""
@@ -68,20 +66,20 @@ class ThreadExtract(Thread):
             value = self._main_window.tc.GetValue()
             parsed = ''
             try:
-                pdfReader = PyPDF2.PdfFileReader(fileName, strict=False)
-                number_of_pages = pdfReader.getNumPages()
+                pdfReader = PyPDF2.PdfReader(fileName, strict=False)
+                number_of_pages = len(reader.pages)
                 try:
-                    page = pdfReader.getPage(0)
-                    page_content = page.extractText()
+                    page = pdfReader.pages[0]
+                    page_content = page.extract_text()
                     parsed = parsed.join(page_content).replace('\n', '')
                 except:
                     print("Erro ao ler PDF! - " + fileName + '\r\n')
             except:
                 print("Erro ao ler PDF! - " + fileName + '\r\n')
 
-            if parsed != '' and re.search('DANFE',parsed) is not None:
+            if parsed != '' and re.findall('\w+',parsed) != '':
                 for x in range(number_of_pages):
-                    page = pdfReader.getPage(x)
+                    page = pdfReader.pages[x]
                     pdf = self.processa_texto(page)
 
                     value = self._main_window.tc.GetValue()
@@ -109,66 +107,22 @@ class ThreadExtract(Thread):
         self.want_abort = 1
 
     def processa_texto(self, page):
-        page_content = page.extractText()
+        page_content = page.extract_text()
         parsed = self.limpa_texto(page_content)
         pdf = self.processa_dados(parsed)
 
         return pdf
 
-    def pdf2png(self, pdf_input_path, png_output_path):
-        args = ["pdf2png", # actual value doesn't matter
-                "-dNOPAUSE",
-                "-sDEVICE=png16m",
-                "-r300",
-                "-sOutputFile=" + png_output_path,
-                pdf_input_path]
-
-        encoding = locale.getpreferredencoding()
-        args = [a.encode(encoding) for a in args]
-
-        try:
-            ghostscript.Ghostscript(*args)
-            ghostscript.cleanup()
-        except:
-            print("Erro", ghostscript.GhostscriptError)
-
-    def convert_pdf_to_img(self, fileName):
-        img_file_path = "{}png".format(fileName[:-3])
-
-        self.pdf2png(fileName, img_file_path,)
-        if os.path.exists(img_file_path):
-            return img_file_path
-        else:
-            return ''
-
-    def carrega_imagem_cortada(self, fileName):
-        image = Image.open(fileName)
-        width, height = image.size
-
-        croppedIm = image.crop((0, 0, width, 700))
-        croppedIm.save(fileName)
-
-        image = Image.open(fileName)
-        return image
-
     def processa_imagem(self, fileName):
         pdf = {'chave': 'ERRO', 'fileName': fileName}
 
         img_file_path = self.convert_pdf_to_img(fileName)
-        image = self.carrega_imagem_cortada(img_file_path)
+        image = Image.open(img_file_path)
         if image is not None:
             texto = pytesseract.image_to_string(image)
             pdf = self.processa_dados(texto)
 
         image.close()
-
-        if os.path.exists(img_file_path):
-            try:
-                os.remove(img_file_path)
-            except OSError as e:
-                print(e)
-            else:
-                print("File is deleted successfully")
 
         return pdf
 
@@ -179,78 +133,33 @@ class ThreadExtract(Thread):
         return parsed
 
     def processa_dados(self, parsed):
-        chave = self.extrai_texto(parsed, r'(\d{4})(\s{1,2})(\d{4})(\s{1,2})(\d{4})(\s{1,2})(\d{4})(\s{1,2})(\d{4})(\s{1,2})(\d{4})(\s{1,2})(\d{4})(\s{1,2})(\d{4})(\s{1,2})(\d{4})(\s{1,2})(\d{4})(\s{1,2})(\d{4})')
-        if chave is not None: print("Critério 1 - Chave: ", chave)
+        # chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})|(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})|(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})|(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})|(\d{44})|(\d{24}) (\d{20})')
+        chave = self.extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})')
+        if chave is not None: print("Chave 01:" + str(chave))
 
         if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{44})')
-            if chave is not None: print("Critério 2 - Chave: ", chave)
+            chave = self.extrai_texto(parsed, '(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})')
+            if chave is not None: print("Chave 02:" + str(chave))
 
         if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})')
-            if chave is not None: print("Critério 3 - Chave: ", chave)
+            chave = self.extrai_texto(parsed, '(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})')
+            if chave is not None: print("Chave 03:" + str(chave))
 
         if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})')
-            if chave is not None: print("Critério 4 - Chave: ", chave)
+            chave = self.extrai_texto(parsed, '(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})')
+            if chave is not None: print("Chave 04:" + str(chave))
 
         if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{10}) (\d{7}) (\d{7}) (\d{11}) (\d{9})')
-            if chave is not None: print("Critério 5 - Chave: ", chave)
+            chave = self.extrai_texto(parsed, '(\d{44})')
+            if chave is not None: print("Chave 05:" + str(chave))
 
         if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{10}) (\d{7}) (\d{18}) (\d{9})')
-            if chave is not None: print("Critério 6 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{6}) (\d{11}) (\d{7}) (\d{11}) (\d{9})')
-            if chave is not None: print("Critério 7 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{3}) (\d{7}) (\d{7}) (\d{7}) (\d{11}) (\d{9})')
-            if chave is not None: print("Critério 8 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{3}) (\d{7}) (\d{7}) (\d{18}) (\d{9})')
-            if chave is not None: print("Critério 9 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{3}) (\d{7}) (\d{24}) (\d{1}) (\d{9})')
-            if chave is not None: print("Critério 10 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{24}) (\d{20})')
-            if chave is not None: print("Critério 11 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{17}) (\d{27})')
-            if chave is not None: print("Critério 12 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{34}) (\d{10})')
-            if chave is not None: print("Critério 13 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{17}) (\d{18}) (\d{9})')
-            if chave is not None: print("Critério 14 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{17}) (\d{17}) (\d{10})')
-            if chave is not None: print("Critério 15 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{4})\.(\d{4})\.(\d{4})\.(\d{4})\.(\d{4})\.(\d{4})\.(\d{4})\.(\d{4})\.(\d{4})\.(\d{4})\.(\d{4})')
-            if chave is not None: print("Critério 16 - Chave: ", chave)
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{2})([,|\.])(\d{4})([,|\.])(\d{2})([,|\.])(\d{3})([,|\.])(\d{3})/(\d{4})-(\d{2})-(\d{2})-(\d{3})-(\d{3})([,|\.])(\d{3})([,|\.])(\d{3})-(\d{3})([,|\.])(\s?)(\d{3})([,|\.])(\d{3})-(\d{1})')
-            if chave is not None: print("Critério 17 - Chave: ", chave)
-
-        if chave is None:
-            chave = self.extrai_texto(parsed, r'(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})')
-            if chave is not None: print("Critério 18 - Chave: ", chave)
+            chave = self.extrai_texto(parsed, '(\d{24}) (\d{20})')
+            if chave is not None: print("Chave 06:" + str(chave))
 
         if chave is not None:
-            chave = chave.group().replace('.', '').replace(',', '').replace('/', '').replace('-', '').replace(' ', '').replace('\n', '')
+            chave = chave.group().replace('.', '').replace(' ', '').replace('\n', '')
+            if chave is not None: print("Chave 07:" + str(chave))
         else:
             chave = ''
 
@@ -263,6 +172,34 @@ class ThreadExtract(Thread):
         textoNovo = textoNovoRegex.search(texto)
 
         return textoNovo
+
+    def pdf2jpeg(self, pdf_input_path, jpeg_output_path):
+        args = []
+        args = ["pef2jpeg", # actual value doesn't matter
+                "-dNOPAUSE",
+                "-sDEVICE=jpeg",
+                "-dJPEGQ=100",
+                "-r144",
+                "-sOutputFile=" + jpeg_output_path,
+                pdf_input_path]
+
+        encoding = locale.getpreferredencoding()
+        args = [a.encode(encoding) for a in args]
+
+        try:
+            ghostscript.Ghostscript(*args)
+            ghostscript.cleanup()
+        except:
+            print("Erro", ghostscript.GhostscriptError)
+
+    def convert_pdf_to_img(self, fileName):
+        img_file_path = "{}jpg".format(fileName[:-3])
+
+        self.pdf2jpeg(fileName, img_file_path,)
+        if os.path.exists(img_file_path):
+            return img_file_path
+        else:
+            return ''
 
 class ExtractorFrame(wx.Frame):
     directory = ''
@@ -374,7 +311,7 @@ class ExtractorFrame(wx.Frame):
         fdlg = wx.FileDialog(None, "Entre com o caminho para o arquivo de resultado", "", "", "text files(*.txt)|*.*", wx.FD_SAVE)
 
         if fdlg.ShowModal() == wx.ID_OK:
-            self.save_path = self.define_extensao_arquivo(fdlg.GetPath())
+            self.save_path = fdlg.GetPath() + ".txt"
 
             extractedFile = open(self.save_path, 'w', encoding="utf-8")
             extractedFile.write(value+'\r\n')
@@ -434,10 +371,3 @@ class ExtractorFrame(wx.Frame):
     def onExit(self, event):
         """Close the frame, terminating the application."""
         self.Close(True)
-
-    def define_extensao_arquivo(self, nome_arquivo):
-        extensao = nome_arquivo[-4::]
-
-        if extensao != '.txt': nome_arquivo += ".txt"
-
-        return nome_arquivo

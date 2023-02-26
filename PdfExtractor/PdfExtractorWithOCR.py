@@ -6,6 +6,7 @@ from PyQt5 import QtCore as qtc
 from PyQt5.QtCore import Qt as qt
 import PyPDF2
 import re
+import TextRegex as tr
 import pandas as pd
 import csv
 from pdf2image import convert_from_path, convert_from_bytes
@@ -65,6 +66,7 @@ class DocPdf:
 
 
 docPdf = DocPdf()
+#tr = TextRegex()
 
 def extrai_texto(texto, padrao):
     textoNovoRegex = re.compile(padrao)
@@ -118,61 +120,19 @@ def processa_imagem(fileName):
     return pdf
 
 def processa_texto(page):
-    page_content = page.extractText()
+    page_content = page.extract_text()
     parsed = limpa_texto(page_content)
     pdf = processa_dados(parsed)
     return pdf
 
 def processa_dados(parsed):
-        numNF = extrai_texto(parsed, "N° (\d{3}).(\d{3}).(\d{3})|N° (\d{1,10})|Nº.  (\d{1,10})    FL 1|No. (\d{1,10})Série|N°(\d{1,10})SÉRIE")
-        if numNF is not None:
-            numNF = extrai_texto(numNF.group(), "(\d{3}).(\d{3}).(\d{3})|(\d{1,10})")
-
-            if numNF is not None:
-                try:
-                    numNF = int(numNF.group().replace('.', '').replace(',', ''))
-                except:
-                    print('numNF: ', numNF)
-            else:
-                numNF = ''
-        else:
-            numNF = ''
-
-        cnpj = extrai_texto(parsed, "(\d{1,3}).(\d{3}).(\d{3})/(\d{4})\\n-\\n(\d{2})|(\d{1,3}).(\d{3}).(\d{3})/(\d{4})-(\d{2})")
-        if cnpj is not None:
-            cnpj = extrai_texto(cnpj.group(), "(\d{1,3}).(\d{3}).(\d{3})/(\d{4})\\n-\\n(\d{2})|(\d{1,3}).(\d{3}).(\d{3})/(\d{4})-(\d{2})")
-
-            if cnpj is not None:
-                cnpj = cnpj.group().replace('\n-\n', '').replace('.', '').replace('-', '').replace('/', '')
-            else:
-                cnpj = ''
-        else:
-            cnpj = ''
-
-        # chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})|(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})|(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})|(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})|(\d{44})|(\d{24}) (\d{20})')
-        chave = extrai_texto(parsed, '(\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4}) (\d{4})')
-
-        if chave is None:
-            chave = extrai_texto(parsed, '(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4}).(\d{4})')
-
-        if chave is None:
-            chave = extrai_texto(parsed, '(\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})  (\d{4})')
-
-        if chave is None:
-            chave = extrai_texto(parsed, '(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})\n(\d{4})')
-
-        if chave is None:
-            chave = extrai_texto(parsed, '(\d{44})')
-
-        if chave is None:
-            chave = extrai_texto(parsed, '(\d{24}) (\d{20})')
-
-        if chave is not None:
-            chave = chave.group().replace('.', '').replace(' ', '').replace('\n', '')
-        else:
-            chave = ''
+        numNF = tr.obtem_num_serie(parsed)
+        cnpj = tr.obtem_cnpj(parsed)
+        chave = tr.obtem_chave(parsed)
 
         pdf_info = {"numNF": str(numNF), "cnpj": cnpj, "chave": chave, "parsed": parsed}
+
+        #print(pdf_info)
 
         return pdf_info
 
@@ -186,24 +146,24 @@ class Worker(qtc.QObject):
             fileName = os.path.join(data_path, item)
 
             pdf_file = open(fileName, 'rb')
-            pdfReader = PyPDF2.PdfFileReader(fileName, strict=False)
-            number_of_pages = pdfReader.getNumPages()
+            pdfReader = PyPDF2.PdfReader(fileName, strict=False)
+            number_of_pages = len(pdfReader.pages)
 
             try:
-                page = pdfReader.getPage(0)
+                page = pdfReader.pages[0]
             except:
                 value += "Erro ao ler PDF! - " + fileName + '\r\n'
                 value += '=========================================================\r\n'
                 self.tc.SetValue(value)
 
-            page_content = page.extractText()
+            page_content = page.extract_text()
             parsed = ''.join(page_content).replace('\n', '')
 
             # print('page_content: ' , page_content)
 
             if parsed != '' and 'CNPJ' in parsed:
                 for x in range(number_of_pages):
-                    page = pdfReader.getPage(x)
+                    page = pdfReader.pages[x]
                     pdf = processa_texto(page)
 
                     if pdf is not None:
@@ -275,8 +235,12 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.worker_thread.start()
 
     def createActions(self):
-        self.actionSelect_Folder = qtw.QAction("&Select Folder", self, shortcut="Ctrl+S", triggered=self.selectDir)
-        self.actionExit = qtw.QAction("E&xit", self, shortcut="Ctrl+Q", triggered=self.close)
+        icon_select_folder = "D:\\Documentos\\Python\\PdfExtractor\\images\\folder-open.png"
+        self.actionSelect_Folder = qtw.QAction(qtg.QIcon(icon_select_folder), "&Select Folder", self, shortcut="Ctrl+S", triggered=self.selectDir)
+        
+        icon_exit = "D:\\Documentos\\Python\\PdfExtractor\\images\\gtk-quit.png"
+        self.actionExit = qtw.QAction(qtg.QIcon(icon_exit), "E&xit", self, shortcut="Ctrl+Q", triggered=self.close)
+        
         self.btnProcessar.clicked.connect(self.inicia_extracao)
         self.btnLimpar.clicked.connect(self.limpar)
         self.btnSalvar.clicked.connect(self.save_data_grid)
