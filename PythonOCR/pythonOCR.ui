@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PythonOCR</class>
+ <widget class="QMainWindow" name="PythonOCR">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PythonOCR</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>800</width>
+      <height>600</height>
+     </rect>
+    </property>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>0</y>
+       <width>790</width>
+       <height>300</height>
+      </rect>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAsNeeded</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAsNeeded</enum>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>786</width>
+        <height>296</height>
+       </rect>
+      </property>
+      <widget class="QLabel" name="imageLbl">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>5</y>
+         <width>790</width>
+         <height>300</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QPlainTextEdit" name="plainTextEditResult">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>305</y>
+       <width>790</width>
+       <height>270</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="fileMenu">
+    <property name="title">
+     <string>File</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="editMenu">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="viewMenu">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="helpMenu">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
+   <addaction name="fileMenu"/>
+   <addaction name="editMenu"/>
+   <addaction name="viewMenu"/>
+   <addaction name="helpMenu"/>
+  </widget>
+  <action name="openAct">
+   <property name="icon">
+    <iconset>
+     <normaloff>icones/folder-open.png</normaloff>icones/folder-open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open...</string>
+   </property>
+  </action>
+  <action name="exitAct">
+   <property name="icon">
+    <iconset>
+     <normaloff>icones/door-open-out.png</normaloff>icones/door-open-out.png</iconset>
+   </property>
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+  </action>
+  <action name="getAct">
+   <property name="icon">
+    <iconset>
+     <normaloff>icones/gear.png</normaloff>icones/gear.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Get Text</string>
+   </property>
+  </action>
+  <action name="cleanAct">
+   <property name="icon">
+    <iconset>
+     <normaloff>icones/eraser.png</normaloff>icones/eraser.png</iconset>
+   </property>
+   <property name="text">
+    <string>C&amp;lean Text</string>
+   </property>
+  </action>
+  <action name="zoomInAct">
+   <property name="text">
+    <string>Zoom &amp;In (25%)</string>
+   </property>
+  </action>
+  <action name="zoomOutAct">
+   <property name="text">
+    <string>Zoom &amp;Out (25%)</string>
+   </property>
+  </action>
+  <action name="normalSizeAct">
+   <property name="text">
+    <string>&amp;Normal Size</string>
+   </property>
+  </action>
+  <action name="fitToWindowAct">
+   <property name="text">
+    <string>&amp;Fit to Window</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
