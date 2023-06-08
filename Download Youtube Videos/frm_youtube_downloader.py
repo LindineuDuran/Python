@@ -198,6 +198,9 @@ class Ui_MainWindow(object):
 
         file_without_ext = os.path.splitext(source)[0]
 
+        print("source: " + source)
+        print("final: " + os.path.join(path, file_without_ext + '.mp3'))
+
         result = subprocess.run(['ffmpeg.exe', '-y', '-i', source, os.path.join(
             path, file_without_ext + '.mp3')], shell=True, check=True)
 

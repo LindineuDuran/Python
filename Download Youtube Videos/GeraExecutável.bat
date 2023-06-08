@@ -1,0 +1,1 @@
+pyinstaller pythonOCR.py --onefile -w youtube_downloader.py

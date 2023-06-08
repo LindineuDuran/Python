@@ -33,7 +33,7 @@ def renomeia_colunas(df, nome_coluna):
     # Resetando o index para juntar no concatenar
     # -------------------------------------------
     df = df.reset_index(drop=True) # drop=True remove o index anterior salvo pela função em uma nova coluna
-    # print(df)
+    print(df)
 
     return df
 
@@ -215,6 +215,7 @@ for codigo_acao in acoes_ibov["Código"]:
 # Redefinindo a ordem das colunas
 # -------------------------------
 if consolidado_acoes.shape[0] > 0:
+    print(consolidado_acoes)
     consolidado_acoes = consolidado_acoes[['Nome da Ação', 'Código da Ação', 'Último Preço', 'Hora', 'Data de Extração', 'Preço Mínimo', 'Preço Máximo', 'Preço de Abertura', 'Fech. Anterior']]
 
 # --------------------------

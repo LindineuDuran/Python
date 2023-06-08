@@ -2,7 +2,7 @@ import plotly.offline as po
 import plotly.offline as py
 import plotly.graph_objs as go
 
-from PyQt5.QtWebEngineWidgets import QWebEngineView
+import PyQtWebEngine
 from PyQt5 import QtCore, QtWidgets
 import sys
 
