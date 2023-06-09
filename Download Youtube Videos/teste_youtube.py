@@ -25,13 +25,21 @@ with yt_dlp.YoutubeDL(ydl_opts) as ydl:
     # info = ydl.extract_info(links, download=False)
     
     # # ℹ️ ydl.sanitize_info makes the info json-serializable
-    print(json.dumps(ydl.sanitize_info(info)))
+    #print(json.dumps(ydl.sanitize_info(info)))
     # print('=================================')
-    print(info.title)
+    #print(info.title)
 
 #audio_name = 'THE LADIES OF  AVALON - CELTIC MUSIC, ELEVAR VIBRAÇÕES DA EMOÇÃO,  DO AMOR,  DA CURA,  E A HARMONIA. [jku4qn0Mchg].f251.webm'
 
+import subprocess
+someFilename = subprocess.getoutput('yt-dlp --print filename https://www.youtube.com/something')
+# then pass someFilename to FFmpeg
 
+subprocess.run('yt-dlp -o thisIsMyName https://www.youtube.com/something')
+# this will likely download a file named thisIsMyName.webm
+
+someFileType = subprocess.getoutput('yt-dlp --print filename -o "%(ext)s" https://www.youtube.com/something')
+print(someFileType)
 
 source = os.path.join(app_path, audio_name)
 
