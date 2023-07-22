@@ -1,4 +1,5 @@
 import os
+import time
 import subprocess
 import yt_dlp
 
@@ -6,7 +7,7 @@ app_path = os.path.dirname(os.path.abspath(__file__))
 ffmpeg = os.path.join(app_path, 'ffmpeg.exe')
 
 # yt-dlp --extract-audio --audio-format mp3 --audio-quality 0 "https://www.youtube.com/watch?v=oHg5SJYRHA0"
-links = 'https://www.youtube.com/watch?v=XKZw2UtWPqA&ab_channel=AurioCorr%C3%A1'
+links = 'https://youtu.be/E-ROzWfJXFg'
 ydl_opts = {'ignoreerrors': True, 'extract-audio': True, 'audio-format': 'mp3', 'audio-quality' : 0}
 
 audio_name = None
@@ -18,6 +19,10 @@ with yt_dlp.YoutubeDL(ydl_opts) as ydl:
     id = info.get('id')
 
 source = os.path.join(app_path, audio_name + ' [' + id + ']' +'.webm')
+#source = os.path.join(app_path, 'Kitaro - Hajimari - Sozo (live) [RhIuQ7GBpCE].webm')
+
+# while not os.path.exists(source):
+#     time.sleep(3)
 
 if os.path.isfile(source.replace(' ', '_')):
     os.remove(source.replace(' ', '_'))

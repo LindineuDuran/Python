@@ -186,12 +186,22 @@ class Ui_MainWindow(object):
     def audioToMp3(self, audio_name):
         path = self.obtem_path()
         source = os.path.join(path, audio_name)
+        source = source.replace('/', '\\')
 
         if os.path.isfile(source.replace(' ', '_')):
             os.remove(source.replace(' ', '_'))
 
-        if ' ' in source:
-            os.rename(source, source.replace(' ', '_'))
+        if ' ' in source and os.path.isfile(source):
+            try:
+                os.rename(source, source.replace(' ', '_'))
+            except FileNotFoundError as error:
+                self.showdialog("Erro!!!", error.strerror + ' : ' + error.filename)
+                print(error)
+                sys.exit(app.exec_())
+        else:
+            self.showdialog("Erro!!!", 'O sistema não pode encontrar o caminho especificado: ' + source)
+            print(error)
+            sys.exit(app.exec_())
 
         audio_name = audio_name.replace(' ', '_')
         source = source.replace(' ', '_')
@@ -206,7 +216,6 @@ class Ui_MainWindow(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = qtw.QApplication(sys.argv)
     MainWindow = qtw.QMainWindow()
     ui = Ui_MainWindow()
