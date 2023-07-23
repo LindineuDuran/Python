@@ -134,6 +134,9 @@ class Ui_MainWindow(object):
             MainWindow, caption='Choose Directory', directory=os.getcwd())
 
         if selected_dir != '':
+            selected_dir = selected_dir.replace('/', '\\')
+            os.rename(selected_dir, selected_dir.replace(' ', ''))
+            selected_dir = selected_dir.replace(' ', '')
             self.destinyText.setText(selected_dir)
 
     def obtem_path(self):
@@ -186,8 +189,7 @@ class Ui_MainWindow(object):
     def audioToMp3(self, audio_name):
         path = self.obtem_path()
         source = os.path.join(path, audio_name)
-        source = source.replace('/', '\\')
-
+        
         if os.path.isfile(source.replace(' ', '_')):
             os.remove(source.replace(' ', '_'))
 
