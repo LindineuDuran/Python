@@ -30,3 +30,4 @@ python -m pip install tkintertable
 python -m pip install numpy==1.19.3
 python -m pip install pyttsx3
 python -m pip install pyinstaller
+python -m pip install scrapy --user
