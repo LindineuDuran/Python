@@ -20,7 +20,7 @@ class SecondSpider(scrapy.Spider):
     
     def parse(self, response):
         item = PracticaloneItem()
-        #item['title'] = response.xpath('//*[@id="content_inner"]/article/div[1]/div[2]/h1').extract()
-        #item['price'] = response.xpath('//*[@id="content_inner"]/article/div[1]/div[2]/p[1]').extract()
+        item['title'] = response.xpath('//*[@id="content_inner"]/article/div[1]/div[2]/h1').extract()
+        item['price'] = response.xpath('//*[@id="content_inner"]/article/div[1]/div[2]/p[1]').extract()
         
         return item

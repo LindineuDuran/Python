@@ -1,0 +1,32 @@
+cd project1
+scrapy startproject practicalone
+
+# You can start your first spider with:
+#cd practicalone
+#scrapy genspider example example.com
+
+spider
+cd practicalone
+===========================================================================
+Meus comandos:
+cd project1
+scrapy startproject MyProj
+cd MyProj 
+scrapy genspider firstspider books.toscrape.com # cria o primeiro spider
+build the spider
+cd MyProj
+cd spiders
+scrapy crawl Books #name = "Books" em class FirstSpider(scrapy.Spider):
+scrapy shell http://books.toscrape.com/index.html #entra no modo interativo do scrapy
+response.xpath('//*[@id="default"]/div/div/div/div/div[1]/h1').get()
+response.xpath('//*[@id="default"]/div/div/div/div/div[1]/h1/text()').get()
+response.css('img').xpath('@src').getall()
+CTRL+Z # exit the shell
+
+scrapy genspider secondbook books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html # cria um segundo spider
+build the spider
+scrapy crawl Books2 -o example.csv
+scrapy shell https://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html
+fetch("https://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html")
+view(response)
+print(response.text)

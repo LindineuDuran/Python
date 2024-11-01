@@ -25,3 +25,7 @@ class FirstSpider(scrapy.Spider):
         filename = 'books-%s.html' % page
         with open(filename, "wb") as f:
             f.write(response.body)
+
+#response.xpath('//*[@id="default"]/div/div/div/div/div[1]/h1').get()
+#response.xpath('//*[@id="default"]/div/div/div/div/div[1]/h1/text()').get()
+#response.css('img').xpath('@src').getall()
