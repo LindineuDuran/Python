@@ -1,0 +1,1 @@
+código de um serviço criado usando o cloud run com docker e python (Flask + Gunicorn) para usarem de referência
