@@ -1,0 +1,26 @@
+# Declaração de um dicionário
+meu_dicionario = {
+                    35:'John',
+                    98:'Peter',
+                    23:'Mariah',
+                    43:'Bill',
+                    50:'Chris'
+                }
+
+# Adicionando elementos ao dicionário
+"""meu_dicionario[35] = 'John'
+meu_dicionario[98] = 'Peter'
+meu_dicionario[23] = 'Mariah'
+meu_dicionario[43] = 'Bill'
+meu_dicionario[50] = 'Chris'"""
+
+# Imprimindo o dicionário
+print(meu_dicionario)
+
+# Acessando valores no dicionário
+valor1 = meu_dicionario[98]
+print('Valor associado a 98:', valor1)
+
+# Iterando sobre as chaves e valores do dicionário
+for chave, valor in meu_dicionario.items():
+    print(f'Chave: {chave}, Valor: {valor}')
