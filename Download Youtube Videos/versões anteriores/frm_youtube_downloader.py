@@ -102,9 +102,11 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Youtube Downloader"))
+        MainWindow.setWindowTitle(_translate(
+            "MainWindow", "Youtube Downloader"))
         self.linkLabel.setText(_translate("MainWindow", "URL link:"))
-        self.destinyLabel.setText(_translate("MainWindow", "File Destination:"))
+        self.destinyLabel.setText(_translate(
+            "MainWindow", "File Destination:"))
         self.folderButton.setText(_translate("MainWindow", "..."))
         self.downloadButton.setText(_translate("MainWindow", "Download"))
         self.videoButton.setText(_translate("MainWindow", "Video"))
@@ -132,6 +134,9 @@ class Ui_MainWindow(object):
             MainWindow, caption='Choose Directory', directory=os.getcwd())
 
         if selected_dir != '':
+            selected_dir = selected_dir.replace('/', '\\')
+            os.rename(selected_dir, selected_dir.replace(' ', ''))
+            selected_dir = selected_dir.replace(' ', '')
             self.destinyText.setText(selected_dir)
 
     def obtem_path(self):
@@ -184,24 +189,35 @@ class Ui_MainWindow(object):
     def audioToMp3(self, audio_name):
         path = self.obtem_path()
         source = os.path.join(path, audio_name)
-
+        
         if os.path.isfile(source.replace(' ', '_')):
             os.remove(source.replace(' ', '_'))
 
-        if ' ' in source:
-            os.rename(source, source.replace(' ', '_'))
+        if ' ' in source and os.path.isfile(source):
+            try:
+                os.rename(source, source.replace(' ', '_'))
+            except FileNotFoundError as error:
+                self.showdialog("Erro!!!", error.strerror + ' : ' + error.filename)
+                print(error)
+                sys.exit(app.exec_())
+        else:
+            self.showdialog("Erro!!!", 'O sistema não pode encontrar o caminho especificado: ' + source)
+            print(error)
+            sys.exit(app.exec_())
 
         audio_name = audio_name.replace(' ', '_')
         source = source.replace(' ', '_')
 
         file_without_ext = os.path.splitext(source)[0]
 
-        self.showdialog("Info!!!", "ffmpeg path: " + ffmpeg)
+        print("source: " + source)
+        print("final: " + os.path.join(path, file_without_ext + '.mp3'))
 
-        result = subprocess.run([ffmpeg, '-y', '-i', source, os.path.join(path, file_without_ext + '.mp3')], shell=True, check=True)
+        result = subprocess.run(['ffmpeg.exe', '-y', '-i', source, os.path.join(
+            path, file_without_ext + '.mp3')], shell=True, check=True)
+
 
 if __name__ == "__main__":
-    import sys
     app = qtw.QApplication(sys.argv)
     MainWindow = qtw.QMainWindow()
     ui = Ui_MainWindow()

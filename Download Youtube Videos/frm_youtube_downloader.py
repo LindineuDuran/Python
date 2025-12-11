@@ -10,8 +10,8 @@
 import sys
 import os
 import subprocess
+import yt_dlp
 from PyQt5 import QtCore, QtGui, QtWidgets as qtw
-from pytube import YouTube
 
 app_path = os.path.dirname(os.path.abspath(__file__))
 ffmpeg = os.path.join(app_path, 'ffmpeg.exe')
@@ -70,16 +70,12 @@ class Ui_MainWindow(object):
         self.downloadButton.setFont(font)
         self.downloadButton.setObjectName("downloadButton")
 
-        self.videoButton = qtw.QRadioButton(self.centralwidget)
-        self.videoButton.setGeometry(QtCore.QRect(20, 118, 50, 17))
-        self.videoButton.setFont(font)
-        self.videoButton.setChecked(True)
-        self.videoButton.setObjectName("videoButton")
-
-        self.audioButton = qtw.QRadioButton(self.centralwidget)
-        self.audioButton.setGeometry(QtCore.QRect(105, 118, 51, 17))
-        self.audioButton.setFont(font)
-        self.audioButton.setObjectName("audioButton")
+        self.fileTypeComboBox = qtw.QComboBox(self.centralwidget)
+        self.fileTypeComboBox.setGeometry(QtCore.QRect(20, 115, 155, 23))
+        self.fileTypeComboBox.setObjectName("fileTypeComboBox")
+        self.fileTypeComboBox.addItem("1 - Baixar VÍDEO")
+        self.fileTypeComboBox.addItem("2 - Baixar ÁUDIO (M4A)")
+        self.fileTypeComboBox.addItem("3 - Baixar ÁUDIO (MP3)")
 
         self.apagaVideoBox = qtw.QCheckBox(self.centralwidget)
         self.apagaVideoBox.setGeometry(QtCore.QRect(190, 118, 95, 17))
@@ -109,8 +105,6 @@ class Ui_MainWindow(object):
             "MainWindow", "File Destination:"))
         self.folderButton.setText(_translate("MainWindow", "..."))
         self.downloadButton.setText(_translate("MainWindow", "Download"))
-        self.videoButton.setText(_translate("MainWindow", "Video"))
-        self.audioButton.setText(_translate("MainWindow", "Audio"))
         self.apagaVideoBox.setText(_translate("MainWindow", "Apagar Vídeo"))
         self.cancelButton.setText(_translate("MainWindow", "Exit"))
 
@@ -143,78 +137,95 @@ class Ui_MainWindow(object):
         path = self.destinyText.text()
         return path
 
-    def downloadVideo(self, link):
-        youtubeObject = YouTube(link)
-        youtubeObject = youtubeObject.streams.get_highest_resolution()
-
-        try:
-            path = self.obtem_path()
-            video_name = youtubeObject.default_filename
-            youtubeObject.download(output_path=path)
-        except:
-            self.showdialog(
-                "Except!!!", "There has been an error in downloading your youtube video")
-
-        return video_name
-
-    def downloadAudio(self, link):
-        youtubeObject = YouTube(link)
-        path = self.obtem_path()
-        audio = youtubeObject.streams.get_audio_only()
-        audio.download(output_path=path)
-
-        audio_name = audio.default_filename
-        return audio_name
-
     def download(self):
-        link = self.urlText.text()
+        url = self.urlText.text()
+        selected_text = self.fileTypeComboBox.currentText()
+        selected_index = self.fileTypeComboBox.currentIndex()
 
-        if self.videoButton.isChecked():
-            video_name = self.downloadVideo(link)
+        print("Selected Text: ", selected_text)
+        print("Selected Item: ", selected_index)
 
-            self.showdialog("Info!!!", "Fim do processo!")
+        baixar(url, selected_text)
 
-            return video_name
 
-        audio_name = self.downloadAudio(link)
-        self.audioToMp3(audio_name)
+# Não funcionou
+""" def extrair_cookies():
+    # Execute o seguinte comando para baixar os cookies: yt-dlp --cookies-from-browser chrome --cookies cookies.txt
 
-        if self.audioButton.isChecked() and self.apagaVideoBox.isChecked():
-            path = self.obtem_path()
-            audio_name = audio_name.replace(' ', '_')
-            os.remove(os.path.join(path, audio_name))
+    print("🔄 Extraindo cookies do Chrome...")
+    try:
+        subprocess.run(
+            ["yt-dlp", "--cookies-from-browser",
+                "chrome", "--cookies", "cookies.txt"],
+            check=True
+        )
+        print("✅ Cookies extraídos com sucesso!\n")
+    except subprocess.CalledProcessError:
+        print("❌ Falha ao extrair cookies. Abra o Chrome, faça login no YouTube e tente novamente.")
+        exit(1) """
 
-        self.showdialog("Info!!!", "Fim do processo!")
 
-    def audioToMp3(self, audio_name):
-        path = self.obtem_path()
-        source = os.path.join(path, audio_name)
-        
-        if os.path.isfile(source.replace(' ', '_')):
-            os.remove(source.replace(' ', '_'))
+def baixar(url, opcao):
+    # Sempre extrai cookies antes de baixar
+    # extrair_cookies()
 
-        if ' ' in source and os.path.isfile(source):
-            try:
-                os.rename(source, source.replace(' ', '_'))
-            except FileNotFoundError as error:
-                self.showdialog("Erro!!!", error.strerror + ' : ' + error.filename)
-                print(error)
-                sys.exit(app.exec_())
-        else:
-            self.showdialog("Erro!!!", 'O sistema não pode encontrar o caminho especificado: ' + source)
-            print(error)
-            sys.exit(app.exec_())
+    # Isso funciona
+    # Execute o seguinte comando para baixar os cookies: yt-dlp --cookies-from-browser chrome --cookies cookies.txt
 
-        audio_name = audio_name.replace(' ', '_')
-        source = source.replace(' ', '_')
+    base_opts = {
+        "cookiefile": "cookies.txt",       # <— cookies obrigatórios
+        "check_formats": True,
+        "retries": 10,
+        "http_headers": {"User-Agent": "Mozilla/5.0"},
+        "outtmpl": "%(title)s.%(ext)s",
+    }
 
-        file_without_ext = os.path.splitext(source)[0]
+    if opcao == "1 - Baixar VÍDEO":
+        print("\n🟦 Baixando VÍDEO na melhor qualidade sem DRM...\n")
+        ydl_opts = {
+            "format": "bv*+ba/b",
+            "check_formats": True,
+            "merge_output_format": "mp4",
+            "outtmpl": "%(title)s.%(ext)s",
+            "retries": 10,
+            "http_headers": {"User-Agent": "Mozilla/5.0"},
+        }
 
-        print("source: " + source)
-        print("final: " + os.path.join(path, file_without_ext + '.mp3'))
+    elif opcao == "2 - Baixar ÁUDIO (M4A)":
+        print("\n🟩 Baixando ÁUDIO em M4A (melhor qualidade)...\n")
+        ydl_opts = {
+            "format": "bestaudio/best",
+            "check_formats": True,
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "m4a",
+                }
+            ],
+            "outtmpl": "%(title)s.%(ext)s",
+        }
 
-        result = subprocess.run(['ffmpeg.exe', '-y', '-i', source, os.path.join(
-            path, file_without_ext + '.mp3')], shell=True, check=True)
+    elif opcao == "3 - Baixar ÁUDIO (MP3)":
+        print("\n🟧 Baixando ÁUDIO em MP3...\n")
+        ydl_opts = {
+            "format": "bestaudio/best",
+            "check_formats": True,
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "192",
+                }
+            ],
+            "outtmpl": "%(title)s.%(ext)s",
+        }
+
+    else:
+        print("❌ Opção inválida.")
+        return
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
 
 
 if __name__ == "__main__":

@@ -122,51 +122,10 @@
      <string>Download</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="videoButton">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>118</y>
-      <width>50</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Video</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="audioButton">
-    <property name="geometry">
-     <rect>
-      <x>105</x>
-      <y>118</y>
-      <width>51</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Audio</string>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="apagaVideoBox">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>200</x>
       <y>118</y>
       <width>95</width>
       <height>17</height>
@@ -194,6 +153,34 @@
     <property name="text">
      <string>Exit</string>
     </property>
+   </widget>
+   <widget class="QComboBox" name="fileTypeComboBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>115</y>
+      <width>155</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>1 - Baixar VÍDEO</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2 - Baixar ÁUDIO (M4A)</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>3 - Baixar ÁUDIO (MP3)</string>
+     </property>
+    </item>
    </widget>
   </widget>
  </widget>
