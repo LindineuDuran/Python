@@ -1,10 +1,14 @@
 import yt_dlp
-
+"""
+o yt-dlp precisa do FFmpeg para processar o vídeo/áudio após o download, e ele deve estar instalado e no PATH.
+Instalar via winget (mais rápido): winget install ffmpeg
+"""
 
 def baixar(url, opcao):
+    """Ler o doc 'Usar Cookie Exporter.odt' para baixar o cookies.txt (NÃO SUBIR O ARQUIVO PARA O GITHUB)"""
     """Execute o seguinte comando para baixar os cookies: yt-dlp --cookies-from-browser chrome --cookies cookies.txt """
     base_opts = {
-        "cookiefile": "cookies.txt",       # <— cookies obrigatórios
+        "cookiefile": "D:\Desenvolvimento de Sistemas\cookies.txt",       # <— cookies obrigatórios
         "check_formats": True,
         "retries": 10,
         "http_headers": {"User-Agent": "Mozilla/5.0"},
