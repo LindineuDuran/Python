@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<application>
+    <object class="MyFrame" name="frame" base="EditFrame">
+        <title>Reconhecimento Ótico de Caracteres</title>
+        <size>800,600</size>
+
+        <object class="wxPanel" name="panel_main">
+            <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+
+                <object class="sizeritem">
+                    <object class="wxPanel" name="panel_image">
+                        <size>800,300</size>
+                    </object>
+                </object>
+
+                <object class="sizeritem">
+                    <object class="wxTextCtrl" name="txt_output">
+                        <style>wxTE_MULTILINE</style>
+                    </object>
+                </object>
+
+            </object>
+        </object>
+    </object>
+</application>
