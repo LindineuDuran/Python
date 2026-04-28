@@ -1,0 +1,13 @@
+from app.infrastructure.logging.logger import get_logger
+logger = get_logger(__name__)
+import wx
+
+class FileDropTarget(wx.FileDropTarget):
+
+    def __init__(self, callback):
+        super().__init__()
+        self.callback = callback
+
+    def OnDropFiles(self, x, y, files):
+        self.callback(files)
+        return True

@@ -1,0 +1,6 @@
+DEBUG = True # False
+LOG_LEVEL = "INFO" # "DEBUG"  # DEBUG / INFO / WARNING / ERROR / CRITICAL
+LOG_DIR = "output"
+LOG_FILE_NAME = "visionparse.log"
+LOG_MAX_MB = 5
+LOG_BACKUP_COUNT = 5
