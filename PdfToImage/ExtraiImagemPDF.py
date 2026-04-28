@@ -37,5 +37,5 @@ def convert(filepath):
         return newfile
 
 # Teste = convert('C:\\Users\\lindineu.duran\\Documents\\Python\\PdfToImage\\Dirf 2020.pdf')
-Teste = convert(r'C:\Users\lindineu.duran\Documents\Python\PdfExtractor\PDFs de Notas Fiscais\14102020 7122 CHAMPION-PO Bloq.PDF')
+Teste = convert(r'D:\Desenvolvimento de Sistemas\GitHub\Python\PdfToImage\Notas.1.pdf')
 print(Teste)
