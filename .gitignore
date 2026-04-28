@@ -1,2 +1,88 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-WebScrapingFiles/~WRL3343.tmp
+# C extensions
+*.so
+*.pyd
+*.dll
+
+# Distribution / packaging
+.Python
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.spec
+*.manifest
+
+# Installer outputs
+*.exe
+*.msi
+*.zip
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.code-workspace
+
+# Logs
+*.log
+logs/
+output/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment variables / secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Local databases
+*.db
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Tesseract local binaries (optional - if bundled manually)
+Tesseract-OCR/
