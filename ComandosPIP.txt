@@ -8,15 +8,16 @@ python -m pip install IMAPClient
 python -m pip install jupyterlab
 python -m pip install lxml
 python -m pip install numpy==1.19.3
+python -m pip install opencv-python
 python -m pip install openpyxl
 python -m pip install pandas
 python -m pip install pandas-datareader
-python -m pip install pdf2image
 python -m pip install pdf2image
 python -m pip install Pillow
 python -m pip install plotly==4.12.0
 python -m pip install pyautogui
 python -m pip install pyinstaller
+python -m pip install pymupdf
 python -m pip install PyPDF2
 python -m pip install pyqt5
 python -m pip install pyqt5-tools
@@ -24,8 +25,10 @@ python -m pip install PyQtWebEngine
 python -m pip install pytesseract
 python -m pip install pyttsx3
 python -m pip install pyzmail36
+python -m pip install requests
 python -m pip install scrapy --user
 python -m pip install seaborn
+python -m pip install selenium
 python -m pip install spyder
 python -m pip install tabulate
 python -m pip install tkintertable
