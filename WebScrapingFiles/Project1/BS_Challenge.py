@@ -15,7 +15,7 @@ def review_count_scrape():
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.text, 'lxml')
     print(r.status_code)
-    product_total_review = [i.text for i in soup.findAll('a', {'class': 'a-size-small a-link-normal'})]
+    product_total_review = [i.text for i in soup.find_all('a', {'class': 'a-size-small a-link-normal'})]
     df = pd.DataFrame(product_total_review)
     print(df)
     

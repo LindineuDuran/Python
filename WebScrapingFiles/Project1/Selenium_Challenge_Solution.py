@@ -5,6 +5,9 @@
 
 import time
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import pandas as pd
 
@@ -14,18 +17,24 @@ import pandas as pd
 
 driver = webdriver.Chrome()
 driver.get('http://sdsclub.com')
-time.sleep(5)
 
 #links
-button_one = driver.find_element_by_xpath('//*[@id="menu-item-456"]/a').click()
-time.sleep(5)
+# Substitua time.sleep(5) por WebDriverWait(driver, 10)
 
-button_two = driver.find_element_by_xpath('//*[@id="category-career"]/div/div[2]/div[4]/div/a/img').click()
-time.sleep(10)
+button_one = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="menu-item-456"]/a')))
+button_one.click()
 
-button_close = driver.find_element_by_class_name('close-icon').click()
+button_two = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="category-career"]//img')))
+button_two.click()
 
-time.sleep(5)
+try:
+    button_close = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, ".close-icon"))
+    )
+    button_close.click()
+except:
+    print("Popup não apareceu")
+
 
 #add parser
 page_source = driver.page_source
@@ -47,7 +56,6 @@ print(df, df_two, df_three)
 time.sleep(10)
 
 driver.quit()
-
 
 df_scrape_one_clean = df.replace('\n', ' ', )
 df_scrape_two_clean = df_two.replace('\n', ' ', )
